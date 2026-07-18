@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "seo-butler-marketplace",
+  "description": "Marketplace hosting the SEO/GEO Butler plugin.",
+  "owner": {
+    "name": "Mert Ağralı",
+    "email": "mmertagrali@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "seo-butler",
+      "description": "Autonomous SEO/GEO butler for developers: one command audits your project, plans expert-level SEO + Generative Engine Optimization work, applies it, and keeps a memory of what was done.",
+      "author": {
+        "name": "Mert Ağralı"
+      },
+      "category": "productivity",
+      "source": "./"
+    }
+  ]
+}
