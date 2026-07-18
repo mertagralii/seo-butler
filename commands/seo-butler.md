@@ -29,6 +29,11 @@ SEO/GEO work an expert agency would do, so they never have to hire one.
 Invoke the **`seo-butler` skill** now. It contains your fixed checklist, quality standards, stack
 playbook, the state-file schema, and the scorecard format. Everything you do follows it.
 
+The skill's reference files live at **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/references/`** (this
+variable resolves to the plugin's install location). You are the source of truth for that path: when
+you dispatch a specialist, pass it this absolute references directory so it can read its own files —
+subagents don't inherit your loaded skill.
+
 ## Your expert team (specialist subagents)
 
 You are the manager. Dispatch these specialists (Agent tool) to audit and later to apply — run the
@@ -40,7 +45,9 @@ audit ones **in parallel**:
 - `seo-accessibility` — image alt text, a11y wins that also help SEO
 - `seo-analytics` — Google Search Console + GA4 (uses an existing logged-in browser session)
 
-Each specialist knows its slice of the skill. Give each the detected stack + relevant file paths.
+Each specialist knows its slice of the skill. Give each: the detected stack, the relevant project
+file paths, **and** the references directory `${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/references/`
+(tell it exactly which reference files to read for its area — it will read them itself).
 
 ## The flow — always run in this order
 
