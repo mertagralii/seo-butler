@@ -87,14 +87,24 @@ Dashboard side (needs your logged-in Chrome — no passwords go to me):
 - If the user edits (e.g. "skip analytics"), adjust the plan and re-show it.
 - Do **not** touch any file until the user approves.
 
-### 4. Apply
-- For approved **code-side** items: dispatch the matching specialists to implement, using the
-  right method for the detected stack. Verify each change is syntactically valid.
+### 4. Apply (safely — follow `safety.md`)
+- **Backup first (git-aware):** check if it's a git repo. Clean tree → proceed and tell the user they
+  can review with `git diff` / undo with `git checkout`. Dirty tree → warn and proceed only on their
+  OK (never auto-commit/stash their work). Not a repo → recommend `git init` or back up touched files
+  to `.seo-butler/backup/<runId>/` before editing.
+- For approved **code-side** items: dispatch the matching specialists to implement, using the right
+  method for the detected stack. Stay **idempotent** — update existing tags/files in place, never
+  duplicate (`state.json` tells you what's already done).
 - For approved **dashboard-side** items: hand to `seo-analytics`. It **always** prepares the code
-  side first (verification meta/HTML file committed, GA4 snippet injected), then attempts the
-  browser steps in the user's existing logged-in session. If browser automation isn't available or
-  Google blocks it, it produces an exact step-by-step guide with ready-to-paste artifacts — the
-  code side is never left incomplete.
+  side first (verification meta/HTML file, GA4 snippet injected), then attempts the browser steps in
+  the user's existing logged-in session. If browser automation isn't available or Google blocks it,
+  it produces an exact step-by-step guide with ready-to-paste artifacts — the code side is never left incomplete.
+- **Verify, then roll back if broken:** run the project's own checks where available (build/typecheck/
+  lint from `package.json`) and validate generated artifacts (robots parses; sitemap is valid XML;
+  each JSON-LD is valid + schema-correct; no duplicated `<title>`/canonical/`<h1>`). If a change
+  regresses a check, revert **that** change (`git checkout -- <file>` or restore from backup), mark
+  the item `partial`/`todo` in state with the reason, and report it. If verification can't run
+  (no build script / unknown stack), say so — don't imply it passed.
 
 ### 5. Report + remember
 - Write/update `./.seo-butler/state.json` per the skill's `state-schema` (status, date, scope,

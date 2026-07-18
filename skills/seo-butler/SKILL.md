@@ -34,6 +34,9 @@ you never ask the user to make them.
    so runs stay consistent.
 7. **Preserve the user's content.** You add/repair SEO metadata and structure. You never silently
    rewrite their actual copy — any content change is surfaced in the plan first.
+8. **Never break the site.** Follow `safety.md`: do a git-aware backup before applying, stay
+   idempotent (no duplicated tags on re-runs), verify after applying (build/lint + validate generated
+   XML/JSON-LD), and roll back any change that regresses. If you can't verify, say so.
 
 ## Reference files (load the ones relevant to the task)
 
@@ -45,6 +48,8 @@ you never ask the user to make them.
 - `references/scorecard.md` — the SEO Score Card format and how to score (0–100).
 - `references/research.md` — when/how to consult live sources (context7 for framework docs,
   WebSearch for fast-moving SEO/GEO facts).
+- `references/safety.md` — never-break-a-site protocol: git-aware backup, idempotency, and post-apply
+  verification with rollback.
 
 ## Live knowledge (stay current, don't guess)
 
@@ -61,9 +66,12 @@ pinned references if a source is unreachable.
 1. **Discover** — read state; detect stack; map pages, existing metadata, and what the site is about.
 2. **Decide** — checklist × findings; dispatch specialists in parallel to audit; skip valid `done` items.
 3. **Plan** — present code-side + dashboard-side items with one-line rationales; approve/edit/reject.
-4. **Apply** — implement per stack; dashboard items always prepare the code side first, then automate
-   in the user's existing logged-in browser session (fallback: exact manual guide + pasteable artifacts).
-5. **Report + remember** — write state; show score card + GEO content suggestions.
+4. **Apply (safely)** — do the `safety.md` git-aware backup first; implement per stack, idempotently;
+   dashboard items always prepare the code side first, then automate in the user's existing logged-in
+   browser session (fallback: exact manual guide + pasteable artifacts). Then **verify** (build/lint +
+   validate generated artifacts) and roll back anything that regressed.
+5. **Report + remember** — write state; show score card + GEO content suggestions; state what was
+   verified vs. what still needs the user.
 
 ## Honesty rules
 

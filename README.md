@@ -22,6 +22,8 @@ and never re-surprises you.
   guessing from stale knowledge.
 - **Honest about GEO.** It prioritizes what actually gets you cited by AI engines (crawlability,
   answer-first structure, evidence) and tells you plainly where a tactic (like llms.txt) is still low-impact.
+- **Never breaks your site.** Git-aware backup before editing, idempotent re-runs (no duplicate tags),
+  and post-apply verification (build/lint + valid XML/JSON-LD) that rolls back anything it regresses.
 - **Remembers.** Writes `.seo-butler/state.json`; next run only touches what changed.
 
 ### Covered
@@ -59,13 +61,13 @@ half-done. Browser automation ships via the bundled Playwright MCP.
 .claude-plugin/   plugin.json, marketplace.json
 commands/         seo-butler.md          (the one command)
 agents/           the specialist team (5)
-skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard, research)
+skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard, research, safety)
 .mcp.json         bundled Playwright + context7 MCPs
 ```
 
 ## Status
 
-**v0.2.0** — deepened expertise (2026-current standards, honest GEO playbook) + live knowledge via
-bundled context7. Planned next: per-stack robustness ("never break a site"), real-tool verification
-(Lighthouse / schema validators), competitor & keyword research, automatic OG image generation, and
-periodic re-checks.
+**v0.3.0** — safety layer ("never break a site"): git-aware backup, idempotency, and post-apply
+verification with rollback. (v0.2.0 deepened expertise to 2026 standards + added live knowledge via
+context7.) Planned next: real-tool verification (Lighthouse / Rich Results & schema validators), then
+new traffic channels (local SEO, deeper measurement, backlinks/directories, auto OG image, periodic re-checks).
