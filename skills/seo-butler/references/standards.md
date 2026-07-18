@@ -1,61 +1,87 @@
 # Best-Practice Standards (decide like an expert, don't ask)
 
-These are the defaults the butler applies. When a choice arises, use these instead of asking the user.
+The defaults the butler applies. When a choice arises, use these instead of asking the user. Values
+reflect 2026 reality. GEO-specific guidance lives in `geo.md`.
 
-## Titles
-- Length: aim **50–60 characters** (hard cap ~65). Unique per page.
-- Pattern: `Primary Page Topic — Brand` for inner pages; `Brand — Value Proposition` for home.
-- Front-load the important words. No keyword stuffing.
+## Titles (`<title>`)
+- **Length:** aim 50–60 characters; hard cap ~60 (Google truncates ~600px, roughly 60 chars). Unique per page.
+- **Pattern:** `Primary Topic — Brand` on inner pages; `Brand — Value Proposition` on the home page.
+- Front-load the most important words; one clear intent per page; no keyword stuffing or repetition.
+- Must match the page's actual `<h1>` intent (don't promise something the page doesn't deliver).
 
 ## Meta descriptions
-- Length: aim **140–160 characters** (hard cap ~165). Unique per page.
-- One clear sentence describing the page + a soft call to action. Written for humans.
+- **Length:** aim 140–160 characters; hard cap ~160. Unique per page. Written for humans (it's a CTR
+  lever, not a ranking factor). Google may rewrite it — still provide a good one.
+- One sentence describing the page's value + a soft call to action. Include the primary term naturally.
+- Never leave it empty on key pages; never duplicate across pages.
 
 ## Canonical
-- Every page self-references its clean, absolute canonical URL (https, no tracking params).
-- Choose one host convention (www vs non-www) and one trailing-slash convention; keep it consistent.
+- Every indexable page self-references its **clean, absolute** canonical URL: `https`, chosen host
+  (www vs non-www — pick one, stay consistent), consistent trailing-slash convention, **no tracking
+  params** (utm_, fbclid, gclid, session ids).
+- Paginated/filtered/duplicate variants point to the canonical primary. Don't canonicalize a page to
+  an unrelated URL.
 
-## Open Graph / Twitter
-- og:type = `website` for home/landing, `article` for posts.
-- og:image: 1200×630, absolute URL. If none exists, note it (v1 does not auto-generate images).
-- Twitter card: `summary_large_image`.
-
-## Structured data (JSON-LD) — choose types by content
-- Always: **Organization** (or **LocalBusiness** if there's a physical address/phone) + **WebSite**
-  (with `potentialAction` SearchAction only if the site has real search).
-- Blog/news post → **Article** / **BlogPosting** (headline, author, datePublished, image).
-- Product page → **Product** (+ **Offer** with price/availability if present in the page).
-- FAQ content → **FAQPage**.
-- Multi-level nav / breadcrumbs → **BreadcrumbList**.
-- Only assert facts actually present on the page. Never fabricate ratings, prices, or authorship.
+## Robots directives & indexation hygiene
+- Public pages: indexable (no stray `noindex`). Thin/utility pages (internal search results, cart,
+  auth, thank-you, staging) → `noindex`.
+- Never leave a site-wide `noindex` or `Disallow: /` from a staging build in production — this is a
+  top cause of "my site vanished from Google." Check for it explicitly.
 
 ## robots.txt
-- Allow crawling of the public site. Disallow only genuine non-public paths (admin, api internals,
-  cart, search result permutations). Always include `Sitemap:` absolute URL.
+- Allow crawling of the public site. `Disallow` only genuine non-public paths (admin, internal APIs,
+  cart, infinite filter permutations). Always include an absolute `Sitemap:` line.
+- **Do NOT block AI citation bots** unless the user opts out (see `geo.md` Tier 1): GPTBot,
+  OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Bingbot.
 
 ## sitemap.xml
-- Include indexable, canonical URLs only (skip noindex, redirects, auth-gated).
-- `lastmod` from real file/content dates when available. Keep it valid XML.
+- Include only indexable, canonical, 200-status URLs (exclude noindex, redirects, auth-gated, canonicalized-away).
+- Valid XML; accurate `<lastmod>` from real content/file dates; split into a sitemap index if >50k URLs or >50MB.
+- Reference it from robots.txt and submit it in Search Console.
 
-## llms.txt (GEO)
-- Root `/llms.txt`, markdown. Include: one-paragraph site summary, what the site/company does,
-  and a linked list of the most important pages with one-line descriptions. Keep it truthful and current.
+## Open Graph / Twitter
+- OG: `og:title`, `og:description`, `og:url` (canonical, absolute), `og:type` (`website` for
+  home/landing, `article` for posts), `og:image` (absolute URL, **1200×630**, <5MB), `og:site_name`, `og:locale`.
+- Twitter: `twitter:card = summary_large_image`, plus title/description/image.
+- If no OG image exists, note it (v1 does not auto-generate images — that's a planned feature).
 
-## GEO content readiness
-- Ensure each key page answers its core question in the first ~2 sentences (answer-first).
-- Prefer clear definitional sentences and FAQ blocks — the formats answer engines quote well.
-- Recommend (don't silently write) content additions; surface them in the report.
+## Structured data (JSON-LD) — pick types by real content
+Emit as `<script type="application/ld+json">`. **Only assert facts present on the page.** Never
+fabricate ratings, prices, authors, or reviews (Google penalizes this; it also breaks trust).
+- **Always:** `Organization` (or `LocalBusiness` if there's a real address/phone) + `WebSite`
+  (add `potentialAction` SearchAction *only* if the site has real on-site search).
+- **Article / BlogPosting** for posts: headline, author, `datePublished`, `dateModified`, image, publisher.
+- **Product** for product pages: name, image, description, brand, and `Offer` (price, priceCurrency,
+  availability) — only if that data is truly on the page. Add `AggregateRating`/`Review` only if real.
+- **FAQPage** for genuine Q&A content (also a strong GEO signal).
+- **BreadcrumbList** where navigation/breadcrumbs exist.
+- Validate mentally against schema.org required/recommended fields; prefer completeness on recommended fields.
 
-## Accessibility
-- Meaningful images: specific, useful alt text (not the filename). Decorative: `alt=""`.
-- `<html lang="…">` matches the primary content language.
+## Favicon / manifest / head hygiene
+- Favicon (ico + svg + apple-touch-icon), `theme-color`, `<meta name="viewport">`, `<meta charset>`,
+  `<html lang>`. A `manifest.webmanifest` for installable/PWA-ish sites.
 
-## Performance
-- Apply only safe, clearly-correct code fixes automatically (set image width/height, add
-  `loading="lazy"` below the fold, add `<link rel="preconnect">` for known origins).
-- Anything risky (bundle splitting, framework config) → report as a recommendation, don't force it.
+## Accessibility (helps SEO)
+- Meaningful images: specific, useful `alt` (describe content + purpose, not the filename). Decorative
+  images: `alt=""`. Never omit the attribute entirely.
+- Descriptive link text (no bare "click here"). `<html lang>` matches primary content language.
+
+## Performance — Core Web Vitals (2026 thresholds)
+Google measures at the **75th percentile of real users (CrUX)**. "Good" targets:
+- **LCP (loading)** — ≤ **2.5 s** (poor > 4.0 s). Usually the hero image or web font.
+- **INP (responsiveness)** — ≤ **200 ms** (poor > 500 ms). Replaced FID in March 2024; the most
+  commonly failed metric. Caused by heavy/long JS tasks blocking the main thread.
+- **CLS (visual stability)** — ≤ **0.1** (poor > 0.25). Caused by images/ads/embeds without reserved
+  space, or late-injected content and fonts.
+
+**Apply automatically (safe):** explicit `width`/`height` (or aspect-ratio) on images to kill CLS;
+`loading="lazy"` below the fold; `fetchpriority="high"` + preload on the LCP image; `preconnect`/
+`dns-prefetch` for known third-party origins; `font-display: swap`.
+**Report, don't force (risky):** JS bundle splitting, hydration/framework config, third-party script
+removal, reordering scripts — anything that could change behavior. Put these in the score card notes.
 
 ## The one thing you DON'T decide: business facts
 Site/brand name, contact email, postal address, phone, social profile URLs. Read them from the
-codebase/content first (footer, contact page, package.json, existing meta). Only if truly absent,
-ask 1–2 plain questions. Everything else is yours to decide.
+codebase/content first (footer, contact/about page, `package.json`, existing meta, `Organization`
+data). Store them in `state.json`. Only if truly absent, ask 1–2 plain questions. Everything else is
+yours to decide as the expert.

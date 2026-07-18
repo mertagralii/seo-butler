@@ -1,7 +1,7 @@
 {
   "name": "seo-butler",
-  "description": "Your autonomous SEO/GEO butler. After you ship a site, run one command and it discovers your whole project, plans every SEO and Generative Engine Optimization task like an expert, then applies them — sitemaps, meta, structured data, alt text, llms.txt, Search Console and Analytics — and remembers what it did so it never re-surprises you.",
-  "version": "0.1.0",
+  "description": "Your autonomous SEO/GEO butler. After you ship a site, run one command and it discovers your whole project, plans every SEO and Generative Engine Optimization task like an expert, then applies them — sitemaps, meta, structured data, alt text, llms.txt, Search Console and Analytics. It stays current by consulting live framework docs (context7) and the web, and remembers what it did so it never re-surprises you.",
+  "version": "0.2.0",
   "author": {
     "name": "Mert Ağralı",
     "email": "mmertagrali@gmail.com"

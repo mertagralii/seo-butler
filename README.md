@@ -17,12 +17,18 @@ and never re-surprises you.
 - **Stack-agnostic.** Detects Next.js, Nuxt, Astro, SvelteKit, plain HTML, WordPress, and more, and
   uses each stack's correct method.
 - **A team of specialists** — technical SEO, GEO/content, performance, accessibility, analytics.
+- **Stays current.** Bundles **context7** (live framework docs) + **Playwright** (browser) MCPs, so it
+  uses each framework's *current* correct method and verifies fast-moving SEO/GEO facts instead of
+  guessing from stale knowledge.
+- **Honest about GEO.** It prioritizes what actually gets you cited by AI engines (crawlability,
+  answer-first structure, evidence) and tells you plainly where a tactic (like llms.txt) is still low-impact.
 - **Remembers.** Writes `.seo-butler/state.json`; next run only touches what changed.
 
 ### Covered
-robots.txt · sitemap.xml · titles & meta · canonical/hreflang · Open Graph & Twitter cards ·
-JSON-LD structured data · favicon/manifest · llms.txt · semantic HTML & AI-answer readiness ·
-image alt text & a11y · Core Web Vitals fixes · Google Search Console · Google Analytics (GA4) ·
+robots.txt (incl. allowing AI citation bots) · sitemap.xml · titles & meta · canonical/hreflang ·
+Open Graph & Twitter cards · JSON-LD structured data · favicon/manifest · **GEO**: AI crawlability,
+answer-first structure, semantic HTML, AI-answer readiness, llms.txt · image alt text & a11y ·
+Core Web Vitals fixes (LCP/INP/CLS, 2026 thresholds) · Google Search Console · Google Analytics (GA4) ·
 a final **SEO Score Card** with content ideas.
 
 ## Install (local, for testing)
@@ -53,11 +59,13 @@ half-done. Browser automation ships via the bundled Playwright MCP.
 .claude-plugin/   plugin.json, marketplace.json
 commands/         seo-butler.md          (the one command)
 agents/           the specialist team (5)
-skills/seo-butler SKILL.md + references/ (checklist, standards, stacks, state, scorecard)
-.mcp.json         bundled Playwright MCP
+skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard, research)
+.mcp.json         bundled Playwright + context7 MCPs
 ```
 
 ## Status
 
-**v0.1.0** — first working version. Planned next: competitor & keyword research, automatic OG image
-generation, and periodic re-checks.
+**v0.2.0** — deepened expertise (2026-current standards, honest GEO playbook) + live knowledge via
+bundled context7. Planned next: per-stack robustness ("never break a site"), real-tool verification
+(Lighthouse / schema validators), competitor & keyword research, automatic OG image generation, and
+periodic re-checks.

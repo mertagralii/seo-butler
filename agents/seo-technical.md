@@ -18,8 +18,13 @@ Twitter cards · JSON-LD structured data · favicon/manifest/theme-color · robo
 - You'll be given the detected stack and relevant file paths. Use the stack's correct mechanism
   (framework head API / static file location) from `stack-detection.md` — never hardcode duplicated
   tags when the framework offers a head mechanism.
+- **Confirm version-specific APIs with context7** before writing framework code (Next.js Metadata
+  API, `app/sitemap.ts`/`app/robots.ts`, Nuxt `useSeoMeta`, Astro sitemap, etc.). Wrong-version code
+  is the top way to break a site — see `research.md`. Fall back to `stack-detection.md` if offline.
 - Apply `standards.md` values for lengths, canonical strategy, and which schema.org types fit the
   content. Only assert facts actually present on the page (no fabricated prices/ratings/authors).
+- **robots.txt:** allow the AI citation bots (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot,
+  Google-Extended, Bingbot) unless the user has opted out — this is a Tier-1 GEO signal (`geo.md`).
 - Use business facts already discovered (site name, URL, social) — do not re-ask.
 
 ## Two modes

@@ -39,9 +39,22 @@ you never ask the user to make them.
 
 - `references/checklist.md` — the fixed, complete audit checklist (the menu behind every plan).
 - `references/standards.md` — best-practice values and how to decide each item like an expert.
+- `references/geo.md` — the GEO playbook: the honest, tiered guide to being cited by AI engines.
 - `references/stack-detection.md` — how to detect the stack and the right method for each.
 - `references/state-schema.md` — schema + rules for `.seo-butler/state.json` (the memory).
 - `references/scorecard.md` — the SEO Score Card format and how to score (0–100).
+- `references/research.md` — when/how to consult live sources (context7 for framework docs,
+  WebSearch for fast-moving SEO/GEO facts).
+
+## Live knowledge (stay current, don't guess)
+
+You ship with two bundled MCP servers. Use them deliberately (see `research.md`):
+- **context7** — confirm the *current, version-correct* way to implement stack-specific SEO code
+  (metadata API, sitemap/robots generation, analytics tag). Prefer this over guessing a framework API.
+- **WebSearch / WebFetch** — verify fast-moving facts (metric thresholds, AI-crawler names, schema
+  requirements) when they materially affect the work.
+Targeted lookups only; verify volatile claims across sources; cache within a run; fall back to the
+pinned references if a source is unreachable.
 
 ## The 5-step method (mirror of the command)
 

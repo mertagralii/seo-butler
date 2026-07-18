@@ -4,22 +4,30 @@ Shown at the end of every run, in the user's language. Goal: the user instantly 
 and feels the work is complete — without needing SEO knowledge.
 
 ## Scoring (0–100)
-Weight the fixed checklist by impact. Suggested weights (sum ~100):
+Weight the fixed checklist by real impact (aligned with `geo.md`'s honest tiers). Suggested weights (sum 100):
 
-- Titles + meta descriptions — 14
-- robots.txt + sitemap.xml — 12
+- Titles + meta descriptions — 12
+- robots.txt + sitemap.xml — 10
 - Canonical / robots hygiene — 8
 - Structured data (JSON-LD) — 12
-- Open Graph + Twitter — 8
-- llms.txt + AI readiness + semantic HTML (GEO) — 16
-- Image alt / accessibility — 8
+- Open Graph + Twitter — 7
+- **GEO: AI crawlability** (citation bots allowed + key content SSR'd) — 10  *(Tier 1, high impact)*
+- **GEO: answer-first structure + semantic HTML + AI readiness** — 10  *(Tier 2)*
+- **GEO: llms.txt** — 2  *(Tier 6, minor — see honesty note)*
+- Content suggestions (evidence/freshness recommendations) — 3
+- Image alt / accessibility — 6
 - Core Web Vitals / performance — 10
-- Search Console — 6
-- Analytics (GA4) — 6
+- Search Console — 5
+- Analytics (GA4) — 5
 
 Score = sum of weights for `done` items + half weight for `partial`. `n/a` items are removed from
 the denominator and the total is renormalized to 100. Compute a **before** (initial audit) and an
 **after** (post-apply) score.
+
+> Honesty note: llms.txt is weighted low on purpose — as of 2026 no major AI engine officially
+> consumes it. Don't let a high score imply AI-citation is guaranteed; the score reflects *setup
+> quality*, not promised placement. Where possible, corroborate with real tools (Lighthouse, Rich
+> Results / schema validators) rather than self-assessment — that's the Phase-3 direction.
 
 ## Report layout
 
