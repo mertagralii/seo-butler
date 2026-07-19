@@ -50,6 +50,8 @@ you never ask the user to make them.
   WebSearch for fast-moving SEO/GEO facts).
 - `references/safety.md` — never-break-a-site protocol: git-aware backup, idempotency, and post-apply
   verification with rollback.
+- `references/strategy.md` — the **optional** keyless strategy phase: keyword research + clustering +
+  competitor gap analysis (advisory, not part of the fixed checklist; runs only when approved).
 
 ## Live knowledge (stay current, don't guess)
 
@@ -70,8 +72,11 @@ pinned references if a source is unreachable.
    dashboard items always prepare the code side first, then automate in the user's existing logged-in
    browser session (fallback: exact manual guide + pasteable artifacts). Then **verify** (build/lint +
    validate generated artifacts) and roll back anything that regressed.
-5. **Report + remember** — write state; show score card + GEO content suggestions; state what was
-   verified vs. what still needs the user.
+4b. **Optional strategy phase** — only if the user approved it in the plan. Run `strategy.md` (keyless
+   keyword research + clustering + competitor gaps → `.seo-butler/strategy.md`); advisory, feeds items
+   21 and 18. Heavy, so it's opt-in — never run it unprompted.
+5. **Report + remember** — write state; show score card + GEO content suggestions (+ strategy summary if
+   it ran); state what was verified vs. what still needs the user.
 
 ## Honesty rules
 

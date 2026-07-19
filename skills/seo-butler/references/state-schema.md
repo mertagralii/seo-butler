@@ -59,9 +59,24 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
   },
   "scoreHistory": [
     { "date": "2026-07-19", "before": 38, "after": 91 }
-  ]
+  ],
+  "strategy": {
+    "lastRun": "2026-07-19",
+    "clusters": [
+      { "name": "example topic", "intent": "informational", "signal": "medium", "target": "/existing-page" },
+      { "name": "gap topic", "intent": "commercial", "signal": "high", "target": null, "gap": true }
+    ],
+    "competitorGaps": [
+      { "competitor": "competitorA.com", "topic": "thing they cover, you don't", "priority": "high" }
+    ],
+    "recommendedTopics": ["<prioritized topic 1>", "<prioritized topic 2>"]
+  }
 }
 ```
+
+> The `strategy` block is **separate from the fixed checklist**. Strategy is an optional, advisory
+> deliverable — it is NOT one of the 29 `items`. It exists only after the user has run the strategy
+> phase; omit it entirely on runs where strategy wasn't approved.
 
 ## Rules
 - The `items` keys are **fixed** and mirror `checklist.md`. Never add ad-hoc keys.

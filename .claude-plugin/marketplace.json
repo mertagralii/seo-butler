@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "seo-butler",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "description": "Autonomous SEO/GEO butler for developers: one command audits your project, plans expert-level SEO + Generative Engine Optimization work, applies it, and keeps a memory of what was done.",
       "author": {
         "name": "Mert Ağralı"

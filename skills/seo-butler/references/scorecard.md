@@ -58,6 +58,12 @@ Score:  38 → 91   ▲ +53
   • /pricing: add a short FAQ (3 Q&A) — strong for AI Overviews
   • /blog: add author + date to posts to unlock richer Article results
 
+🔍 Strategy (only if the strategy phase ran — else: "Strategy: skipped (opt-in)")
+  • Keyword clusters: <N> (by intent) → full map in .seo-butler/strategy.md
+  • Top gaps vs competitors (auto-detected: competitorA.com — correct if wrong): <topic>, <topic>
+  • Recommended topics (prioritized): <topic 1>, <topic 2>
+  • Signals are qualitative (high/med/low) — keyless, no fabricated search volumes
+
 📌 Notes
   • 1 render-blocking script found — moving it is optional, I left it to avoid breaking anything.
 

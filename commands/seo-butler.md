@@ -91,7 +91,10 @@ Dashboard side (needs your logged-in Chrome — no passwords go to me):
   • Google Search Console — add & verify site, submit sitemap
   • Google Analytics (GA4) — set up + inject measurement tag
 
-[ Approve ]   [ Edit — e.g. "skip analytics" ]   [ Reject ]
+Optional (heavy, opt-in — skip to keep this run fast):
+  🔍 Strategy — keyword research + competitor analysis (keyless: qualitative signals, no volumes)
+
+[ Approve ]   [ Edit — e.g. "skip analytics" / "include strategy" ]   [ Reject ]
 ```
 
 - If the user edits (e.g. "skip analytics"), adjust the plan and re-show it.
@@ -115,6 +118,14 @@ Dashboard side (needs your logged-in Chrome — no passwords go to me):
   regresses a check, revert **that** change (`git checkout -- <file>` or restore from backup), mark
   the item `partial`/`todo` in state with the reason, and report it. If verification can't run
   (no build script / unknown stack), say so — don't imply it passed.
+
+### 4b. Optional strategy phase (only if approved)
+If the user approved the **🔍 Strategy** line (or asked for strategy / passed a strategy hint), run the
+strategy phase via `seo-geo-content` in strategy mode, following `${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/
+references/strategy.md`. It's **keyless**: keyword ideas + intent + clustering + competitor gaps from free
+web signals — **no fabricated volumes** (qualitative high/med/low). Auto-detected competitors are shown
+for the user to correct. Output: `./.seo-butler/strategy.md`; findings feed item 21 (on-page keyword
+targeting) and item 18 (content suggestions). If not approved, skip it and note "Strategy: skipped (opt-in)".
 
 ### 5. Report + remember
 - Write/update `./.seo-butler/state.json` per the skill's `state-schema` (status, date, scope,

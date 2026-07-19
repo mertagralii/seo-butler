@@ -34,7 +34,8 @@ Open Graph & Twitter card · JSON-LD structured data · favicon/manifest · kır
 **On-page**: iç linkleme, keyword/konu hedefleme (cannibalization dahil) · **GEO**: AI crawlability,
 cevap-önce yapı, semantic HTML, AI-cevap hazırlığı, llms.txt · görsel alt text & erişilebilirlik ·
 Core Web Vitals düzeltmeleri (LCP/INP/CLS, 2026 eşikleri) · Google Search Console · Google Analytics
-(GA4) · sonunda içerik önerileriyle bir **SEO Skor Kartı**.
+(GA4) · **opsiyonel Strateji fazı**: keyword araştırma + rakip analizi (anahtarsız — nitel sinyal, hacim
+yok) · sonunda içerik önerileriyle bir **SEO Skor Kartı**.
 
 ## Kurulum
 
@@ -96,7 +97,8 @@ Open Graph & Twitter cards · JSON-LD structured data · favicon/manifest · bro
 **On-page**: internal linking, keyword/topic targeting (incl. cannibalization) · **GEO**: AI crawlability,
 answer-first structure, semantic HTML, AI-answer readiness, llms.txt · image alt text & a11y ·
 Core Web Vitals fixes (LCP/INP/CLS, 2026 thresholds) · Google Search Console · Google Analytics (GA4) ·
-a final **SEO Score Card** with content ideas.
+an **optional Strategy phase**: keyword research + competitor analysis (keyless — qualitative signals, no
+volumes) · a final **SEO Score Card** with content ideas.
 
 ## Install
 
@@ -126,15 +128,16 @@ half-done. Browser automation ships via the bundled Playwright MCP.
 .claude-plugin/   plugin.json, marketplace.json
 commands/         seo-butler.md          (the one command)
 agents/           the specialist team (5)
-skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard, research, safety)
+skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard, research, safety, strategy)
 .mcp.json         bundled Playwright + context7 MCPs
 ```
 
 ## Status
 
-**v0.5.0** — on-page additions: broken-link checks, internal linking, and keyword/topic targeting
-(with cannibalization), all under the safety layer. (v0.4.0 reference-path robustness + bilingual README;
-v0.3.0 "never break a site" safety; v0.2.0 deepened expertise + live knowledge via context7.) Planned
-next: strategy module (keyword research/clustering + competitor analysis) and real-tool verification
-(Lighthouse / Rich Results & schema validators), then more traffic channels (local SEO, deeper
-measurement, backlinks/directories, auto OG image, periodic re-checks).
+**v0.6.0** — optional **Strategy phase**: keyless keyword research + clustering + competitor gap analysis,
+offered as an opt-in plan item, writing `.seo-butler/strategy.md` and feeding the on-page work (no
+fabricated volumes). (v0.5.0 on-page: broken links, internal linking, keyword targeting; v0.4.0
+reference-path robustness + bilingual README; v0.3.0 "never break a site" safety; v0.2.0 deepened
+expertise + live knowledge via context7.) Planned next: real-tool verification (Lighthouse / Rich Results
+& schema validators), optional API-key enrichment for real keyword volumes, then more traffic channels
+(local SEO, deeper measurement, backlinks/directories, auto OG image, periodic re-checks).
