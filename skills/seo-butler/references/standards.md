@@ -80,6 +80,33 @@ Google measures at the **75th percentile of real users (CrUX)**. "Good" targets:
 **Report, don't force (risky):** JS bundle splitting, hydration/framework config, third-party script
 removal, reordering scripts — anything that could change behavior. Put these in the score card notes.
 
+## Broken links
+- **Internal links:** every internal `href` must resolve to a real route/file/anchor. Detect from the
+  route map / file tree (and, for a running site, by checking responses). When the intended target is
+  **unambiguous** (obvious typo, moved path with a clear replacement), fix it in the plan; otherwise
+  **report** it with the source location so the user decides.
+- **External links:** best-effort HTTP check. Treat as **report-only** — never auto-edit or remove.
+  External sites go down for reasons that aren't the user's fault, and checks are flaky; surface a list
+  of suspected-dead externals, don't act on them.
+
+## Internal linking
+- **No orphan pages:** every indexable page should be reachable via at least one internal link.
+- **Contextual links:** connect genuinely related pages (topic clusters); link important pages more.
+- **Descriptive anchors:** anchor text describes the destination (no bare "click here" / "read more").
+- **Reasonable depth:** key pages within ~3 clicks of the home page.
+- Adding links edits body content → **propose in the plan and apply on approval**; don't stuff links.
+
+## Keyword / topic targeting
+- **One clear intent per page.** Identify each page's primary topic/keyword from its actual content
+  (don't invent one). The primary term should appear naturally in the **title, H1, first ~100 words,
+  meta description, and ideally the URL slug** — without keyword stuffing.
+- **Semantic coverage:** include the natural related terms/entities a page on this topic would have;
+  optimize for topic, not exact-match repetition.
+- **Cannibalization:** if two pages target the same intent/term, flag it and recommend consolidating or
+  differentiating them — don't silently merge.
+- **Edit boundary:** meta / title / H1 / alt are edited **directly**; edits to the user's **body copy**
+  are **proposed in the plan and applied on approval** — never silent, never fabricated. No new articles.
+
 ## The one thing you DON'T decide: business facts
 Site/brand name, contact email, postal address, phone, social profile URLs. Read them from the
 codebase/content first (footer, contact/about page, `package.json`, existing meta, `Organization`

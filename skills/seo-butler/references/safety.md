@@ -28,8 +28,10 @@ Run this check after the plan is approved, before touching any file:
 ## Preserve the user's work
 - Never overwrite existing meaningful metadata/content without surfacing it in the plan. **Complete
   and repair; don't replace.**
-- GEO edits are structural (headings, FAQ scaffolding); substantive copy is *proposed in the report*,
-  not silently written. Never fabricate facts/stats/reviews to fill schema.
+- **Body-copy edit boundary:** metadata fields (title, meta, headings, alt) may be edited directly.
+  Edits to the user's **substantive body copy** (keyword/readability/internal-link edits) are only ever
+  applied **after the user approves them in the plan** — never silently. Never fabricate facts/stats/
+  reviews, and never write new articles/content from scratch.
 - Match the project's conventions: indentation, quote style, framework idioms.
 
 ## After applying — verify, then roll back if broken

@@ -30,7 +30,8 @@ her seferinde yeni sürprizlerle şaşırtmaz.
 
 ### Kapsam
 robots.txt (AI kaynak botlarına izin dahil) · sitemap.xml · title & meta · canonical/hreflang ·
-Open Graph & Twitter card · JSON-LD structured data · favicon/manifest · **GEO**: AI crawlability,
+Open Graph & Twitter card · JSON-LD structured data · favicon/manifest · kırık link kontrolü ·
+**On-page**: iç linkleme, keyword/konu hedefleme (cannibalization dahil) · **GEO**: AI crawlability,
 cevap-önce yapı, semantic HTML, AI-cevap hazırlığı, llms.txt · görsel alt text & erişilebilirlik ·
 Core Web Vitals düzeltmeleri (LCP/INP/CLS, 2026 eşikleri) · Google Search Console · Google Analytics
 (GA4) · sonunda içerik önerileriyle bir **SEO Skor Kartı**.
@@ -91,7 +92,8 @@ and never re-surprises you.
 
 ### Covered
 robots.txt (incl. allowing AI citation bots) · sitemap.xml · titles & meta · canonical/hreflang ·
-Open Graph & Twitter cards · JSON-LD structured data · favicon/manifest · **GEO**: AI crawlability,
+Open Graph & Twitter cards · JSON-LD structured data · favicon/manifest · broken-link checks ·
+**On-page**: internal linking, keyword/topic targeting (incl. cannibalization) · **GEO**: AI crawlability,
 answer-first structure, semantic HTML, AI-answer readiness, llms.txt · image alt text & a11y ·
 Core Web Vitals fixes (LCP/INP/CLS, 2026 thresholds) · Google Search Console · Google Analytics (GA4) ·
 a final **SEO Score Card** with content ideas.
@@ -130,8 +132,9 @@ skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, sta
 
 ## Status
 
-**v0.4.0** — reference-path robustness (specialist agents reliably read the bundled skill references via
-`${CLAUDE_PLUGIN_ROOT}`) + bilingual README. (v0.3.0 added the "never break a site" safety layer; v0.2.0
-deepened expertise to 2026 standards + live knowledge via context7.) Planned next: real-tool
-verification (Lighthouse / Rich Results & schema validators), then new traffic channels (local SEO,
-deeper measurement, backlinks/directories, auto OG image, periodic re-checks).
+**v0.5.0** — on-page additions: broken-link checks, internal linking, and keyword/topic targeting
+(with cannibalization), all under the safety layer. (v0.4.0 reference-path robustness + bilingual README;
+v0.3.0 "never break a site" safety; v0.2.0 deepened expertise + live knowledge via context7.) Planned
+next: strategy module (keyword research/clustering + competitor analysis) and real-tool verification
+(Lighthouse / Rich Results & schema validators), then more traffic channels (local SEO, deeper
+measurement, backlinks/directories, auto OG image, periodic re-checks).

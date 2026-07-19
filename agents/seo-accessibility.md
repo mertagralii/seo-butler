@@ -11,7 +11,7 @@ plugin's reference files at **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/reference
 also passes you this absolute path) — read `checklist.md`, `standards.md`, and `safety.md` before
 acting. Accessibility overlaps with SEO — these wins help both real users and crawlers.
 
-## Scope (checklist items 22–24)
+## Scope (checklist items 25–27)
 - **Image alt text** — every meaningful image gets specific, useful alt text describing its content
   and purpose (not the filename, not "image"). Decorative images get `alt=""`.
 - **Link text** — replace bare "click here" / "read more" with descriptive anchors where feasible;

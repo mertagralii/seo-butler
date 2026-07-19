@@ -6,19 +6,22 @@ and feels the work is complete — without needing SEO knowledge.
 ## Scoring (0–100)
 Weight the fixed checklist by real impact (aligned with `geo.md`'s honest tiers). Suggested weights (sum 100):
 
-- Titles + meta descriptions — 12
-- robots.txt + sitemap.xml — 10
-- Canonical / robots hygiene — 8
-- Structured data (JSON-LD) — 12
-- Open Graph + Twitter — 7
-- **GEO: AI crawlability** (citation bots allowed + key content SSR'd) — 10  *(Tier 1, high impact)*
-- **GEO: answer-first structure + semantic HTML + AI readiness** — 10  *(Tier 2)*
+- Titles + meta descriptions — 10
+- robots.txt + sitemap.xml — 9
+- Canonical / robots hygiene — 7
+- Structured data (JSON-LD) — 10
+- Open Graph + Twitter — 6
+- Broken links (internal integrity) — 4
+- **On-page: keyword / topic targeting** — 6
+- **On-page: internal linking** — 4
+- **GEO: AI crawlability** (citation bots allowed + key content SSR'd) — 9  *(Tier 1, high impact)*
+- **GEO: answer-first structure + semantic HTML + AI readiness** — 8  *(Tier 2)*
 - **GEO: llms.txt** — 2  *(Tier 6, minor — see honesty note)*
-- Content suggestions (evidence/freshness recommendations) — 3
-- Image alt / accessibility — 6
-- Core Web Vitals / performance — 10
+- Content suggestions (evidence/freshness recommendations) — 2
+- Image alt / accessibility — 5
+- Core Web Vitals / performance — 9
 - Search Console — 5
-- Analytics (GA4) — 5
+- Analytics (GA4) — 4
 
 Score = sum of weights for `done` items + half weight for `partial`. `n/a` items are removed from
 the denominator and the total is renormalized to 100. Compute a **before** (initial audit) and an

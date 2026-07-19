@@ -39,8 +39,8 @@ subagents don't inherit your loaded skill.
 You are the manager. Dispatch these specialists (Agent tool) to audit and later to apply — run the
 audit ones **in parallel**:
 
-- `seo-technical` — robots.txt, sitemap.xml, meta/title, canonical, hreflang, Open Graph, JSON-LD
-- `seo-geo-content` — llms.txt, semantic HTML, AI-answer readiness, concrete content suggestions
+- `seo-technical` — robots.txt, sitemap.xml, meta/title, canonical, hreflang, Open Graph, JSON-LD, broken links
+- `seo-geo-content` — GEO (crawlability, answer-first, llms.txt) + on-page (internal linking, keyword/topic targeting)
 - `seo-performance` — Core Web Vitals / speed findings and code-level fixes
 - `seo-accessibility` — image alt text, a11y wins that also help SEO
 - `seo-analytics` — Google Search Console + GA4 (uses an existing logged-in browser session)
@@ -83,6 +83,9 @@ Code side (I'll do these directly):
   • alt text — <N> images
   • llms.txt + semantic structure (GEO: be citable by AI engines)
   • canonical / hreflang
+  • broken links — <N> internal fixed, <N> external flagged (report-only)
+  • internal linking — <N> orphan pages, <N> contextual links (body edits: on approval)
+  • keyword/topic targeting — <N> pages, <N> cannibalization flagged (meta direct; body: on approval)
 
 Dashboard side (needs your logged-in Chrome — no passwords go to me):
   • Google Search Console — add & verify site, submit sitemap

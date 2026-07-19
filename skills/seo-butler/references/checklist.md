@@ -21,35 +21,42 @@ Statuses: `done` · `partial` · `skipped` (user chose to skip) · `todo` · `n/
 11. **Meta robots / noindex hygiene** — no accidental `noindex` on pages that should rank; staging
     or thin pages correctly excluded.
 12. **Clean, descriptive URLs** — flag obviously bad patterns (query-string-only, IDs) as a note.
+13. **Broken links** — internal links resolve to real routes/files (fix in-plan when the target is
+    unambiguous, else report); external links checked best-effort and **report-only** (never auto-fixed).
 
-## B. GEO / Content — `seo-geo-content`  (see `geo.md` for the full playbook + honest impact tiers)
-13. **AI crawlability** — robots.txt allows citation bots (GPTBot, OAI-SearchBot, ClaudeBot,
+## B. GEO & On-page content — `seo-geo-content`  (see `geo.md` for the full GEO playbook + honest tiers)
+14. **AI crawlability** — robots.txt allows citation bots (GPTBot, OAI-SearchBot, ClaudeBot,
     PerplexityBot, Google-Extended, Bingbot); key content is server-rendered (flag SPA gaps);
     nothing important behind login/paywall. **(Tier 1 — highest impact.)**
-14. **Answer-first structure** — key pages/sections answer their core question in the first ~2
+15. **Answer-first structure** — key pages/sections answer their core question in the first ~2
     sentences; question-based headings ("What is X?"); one clear h1; scannable lists/tables. **(Tier 2.)**
-15. **Semantic HTML** — correct h1–h3 hierarchy, landmarks, one h1 per page.
-16. **AI-answer readiness** — definitional sentences + FAQ blocks where genuinely useful.
-17. **Content suggestions (evidence & freshness)** — concrete, per-page recommendations surfaced in
+16. **Semantic HTML** — correct h1–h3 hierarchy, landmarks, one h1 per page.
+17. **AI-answer readiness** — definitional sentences + FAQ blocks where genuinely useful.
+18. **Content suggestions (evidence & freshness)** — concrete, per-page recommendations surfaced in
     the report, not auto-written: add real statistics/quotes/cited sources (measured citation
     boosters), add an FAQ, add original data, refresh dates. **(Tiers 3–4.)**
-18. **llms.txt** — create root-level file (cheap, future-proofing) **but report its impact honestly**:
+19. **llms.txt** — create root-level file (cheap, future-proofing) **but report its impact honestly**:
     ~2% adoption, no major AI company officially consumes it yet. Nice-to-have, not a ranking lever. **(Tier 6.)**
+20. **Internal linking** — no orphan pages; contextual links between related pages; descriptive anchor
+    text; reasonable click depth. Adding links touches body content → **propose in the plan, apply on approval**.
+21. **Keyword / topic targeting** — each page has one clear primary topic/intent present in
+    title/H1/first ~100 words/meta/URL; flag **cannibalization** (two pages competing for the same term).
+    Meta/title/H1/alt edited directly; **body-copy edits proposed in the plan, applied on approval** (never silent).
 
 ## C. Performance — `seo-performance`  (2026 thresholds in `standards.md`)
-19. **Core Web Vitals** — identify likely LCP (≤2.5s) / INP (≤200ms) / CLS (≤0.1) problems from the code.
-20. **Image optimization** — dimensions set, modern formats, lazy-loading where safe.
-21. **Render-blocking / bundle notes** — flag heavy blocking resources; apply safe code fixes,
+22. **Core Web Vitals** — identify likely LCP (≤2.5s) / INP (≤200ms) / CLS (≤0.1) problems from the code.
+23. **Image optimization** — dimensions set, modern formats, lazy-loading where safe.
+24. **Render-blocking / bundle notes** — flag heavy blocking resources; apply safe code fixes,
     report the rest.
 
 ## D. Accessibility (SEO-adjacent) — `seo-accessibility`
-22. **Image alt text** — every meaningful image has descriptive alt; decorative images `alt=""`.
-23. **Link text** — no bare "click here"; descriptive anchors.
-24. **Language attribute** — `<html lang>` set correctly.
+25. **Image alt text** — every meaningful image has descriptive alt; decorative images `alt=""`.
+26. **Link text** — no bare "click here"; descriptive anchors.
+27. **Language attribute** — `<html lang>` set correctly.
 
 ## E. Dashboards — `seo-analytics`
-25. **Google Search Console** — site added, ownership verified, sitemap submitted.
-26. **Google Analytics (GA4)** — property set up, measurement tag injected into the site.
+28. **Google Search Console** — site added, ownership verified, sitemap submitted.
+29. **Google Analytics (GA4)** — property set up, measurement tag injected into the site.
 
-> Dashboard items (25–26) always prepare their code side first (verification file/meta, GA4 tag)
+> Dashboard items (28–29) always prepare their code side first (verification file/meta, GA4 tag)
 > so the code is complete even if the browser steps must be finished by the user.
