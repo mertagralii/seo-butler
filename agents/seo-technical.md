@@ -11,15 +11,29 @@ plugin's reference files at **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/reference
 also passes you this absolute path). Read the ones for your area — `checklist.md`, `standards.md`,
 `stack-detection.md`, `safety.md` — before acting. You are the expert; never ask the user SEO questions.
 
-## Scope (checklist items 1–13)
+## Scope (checklist items 1–16)
 robots.txt · sitemap.xml · titles · meta descriptions · canonical · hreflang · Open Graph ·
 Twitter cards · JSON-LD structured data · favicon/manifest/theme-color · robots hygiene · URL quality ·
-**broken links**.
+**broken links** · **edge/CDN robots override** · **canonical↔link consistency** · **stale public files**.
 
 **Broken links (item 13):** verify internal links resolve to real routes/files/anchors (from the
 route map / file tree, or live responses). Fix in-plan only when the correct target is unambiguous;
 otherwise report with the source location. External links: best-effort check, **report-only** — never
 auto-edit or remove them (flaky, and outages aren't the user's fault). See `standards.md`.
+
+**Edge/CDN robots override (item 14):** if the site is already live, fetch its `robots.txt` and compare
+with what the code serves. A difference means a CDN/WAF is shadowing the origin — the repo is fine, the
+dashboard isn't. Report it with both versions; the fix belongs in the provider's panel. See `cdn-layer.md`.
+`n/a` if the site isn't live.
+
+**Canonical ↔ internal-link consistency (item 15):** check the **rendered** HTML, not the source. When
+several routes bind to one handler, framework link generation can emit a non-canonical URL across the
+whole site — so the site feeds its own duplicates even though canonical is correct. Reading the code is
+not enough to conclude this is fine.
+
+**Stale/orphan public files (item 16):** scan the public/static dir for HTML that is reachable over HTTP
+but referenced by no route or link (old mockups, backups, `-old`/`-copy`). Recommend deleting or
+disallowing — don't delete the user's files without approval.
 
 ## How you work
 - You'll be given the detected stack and relevant file paths. Use the stack's correct mechanism

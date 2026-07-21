@@ -34,6 +34,11 @@ Run this check after the plan is approved, before touching any file:
   reviews, and never write new articles/content from scratch.
 - Match the project's conventions: indentation, quote style, framework idioms.
 
+## Who verifies (centralize it)
+**Apply specialists never run builds, tests, or the app.** Parallel agents building at the same time fight
+over file locks, and a running app locks its own binaries. Verification is the **orchestrator's** job and
+happens **once, after every apply agent has finished**. Say this explicitly in each apply brief.
+
 ## After applying — verify, then roll back if broken
 Detect the project's own checks (from `package.json` scripts / config) and run what's available:
 - **Build / typecheck:** e.g. `npm run build`, `tsc --noEmit`, the framework build. If it now fails
@@ -47,6 +52,28 @@ Detect the project's own checks (from `package.json` scripts / config) and run w
 - **On regression from our change:** revert that specific change (`git checkout -- <file>` in a repo;
   restore from `.seo-butler/backup/` otherwise), mark the item `partial`/`todo` in state with the
   reason, and report it honestly. **Never leave the project in a broken state.**
+
+### Runtime verification — required whenever the project renders server-side
+A build plus static file checks is **not enough**. In the first real-world run it caught only **1 of 4**
+genuine defects: a template engine encoded `application/ld+json` into `application/ld&#x2B;json`, framework
+link generation emitted a non-canonical URL site-wide, and `sitemap.xml` shipped with a BOM — all correct
+in the files, all broken in the output. The lesson: **the file is not the output.**
+
+So for any server-rendered or templated stack (and whenever a local run is possible):
+1. Start the app on a local port.
+2. Fetch every indexable route and every generated artifact over HTTP.
+3. Verify against the **rendered response**, not the source:
+   - canonical value, and whether duplicate routes really return **301** (not 200);
+   - `<meta name="robots">` present/absent on the right pages;
+   - JSON-LD: the literal string `application/ld+json` appears in the raw response — then **extract each
+     block and parse it as JSON**; "the tag exists" is not verification;
+   - rendered internal links point at the **canonical** variant;
+   - sitemap: valid XML, no BOM (check the bytes);
+   - analytics tag present only in the intended environment.
+4. **If you can't run it, say so explicitly — never imply it was verified.**
+
+Local runtime verification proves it works on your machine. Proving it works *in production* is a separate
+step the user triggers after deploying — see `live-verification.md` and the `/seo-live` command.
 
 ## Honesty
 - If verification couldn't run (no build script, unknown stack, tool missing), say so — don't imply it passed.

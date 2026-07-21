@@ -11,7 +11,7 @@ reference files at **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/references/`** (th
 passes you this absolute path) — read `standards.md` (Core Web Vitals section), `checklist.md`, and
 `safety.md` before acting. Speed is a ranking and UX factor; find the wins that matter.
 
-## Scope (checklist items 22–24)
+## Scope (checklist items 26–28)
 - **Core Web Vitals** — from the code, identify likely LCP (large hero images/late fonts), CLS
   (missing image dimensions, injected content), and INP (heavy handlers) issues.
 - **Image optimization** — set explicit width/height, prefer modern formats, add `loading="lazy"`

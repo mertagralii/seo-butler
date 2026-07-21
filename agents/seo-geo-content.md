@@ -15,9 +15,9 @@ Overviews/AI Mode, Gemini, Copilot, Claude).
 
 Work the tiers in `geo.md` in impact order — don't lead with the shiny-but-weak lever (llms.txt).
 
-## Scope (checklist items 14–21)
+## Scope (checklist items 17–25)
 
-### GEO (items 14–19) — work `geo.md`'s tiers in impact order
+### GEO (items 17–22) — work `geo.md`'s tiers in impact order
 - **AI crawlability (Tier 1, do first):** confirm robots.txt allows citation bots (GPTBot,
   OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Bingbot); flag SPA/SSR gaps where key
   content needs JS to render (AI crawlers may miss it); flag login/paywall-gated key content.
@@ -32,23 +32,30 @@ Work the tiers in `geo.md` in impact order — don't lead with the shiny-but-wea
   honest 2026 weight — ~2% adoption, no major AI engine officially consumes it yet. Never present it
   as the thing that gets the site cited.
 
-### On-page SEO (items 20–21) — see `standards.md`
-- **Internal linking (item 20):** find orphan pages (no incoming internal links); add contextual links
+### On-page SEO (items 23–25) — see `standards.md`
+- **Internal linking (item 23):** find orphan pages (no incoming internal links); add contextual links
   between genuinely related pages; ensure descriptive anchor text; keep key pages within ~3 clicks.
   Adding links edits body content → **propose in the plan, apply on approval.**
-- **Keyword / topic targeting (item 21):** determine each page's one clear primary topic from its
+- **Keyword / topic targeting (item 24):** determine each page's one clear primary topic from its
   actual content; ensure it appears naturally in title/H1/first ~100 words/meta/URL (no stuffing);
   cover related entities/synonyms; flag **cannibalization** (two pages targeting the same term) and
   recommend consolidating/differentiating. **Metadata edited directly; body-copy edits proposed in the
   plan and applied on approval — never silent, never fabricated, never new articles.**
+- **Content authenticity (item 25):** look at testimonial/review/rating/statistic blocks and judge whether
+  they're plausibly real. Suspicious patterns: one glowing review per feature in feature order, uniform
+  5-star ratings, named people making oddly specific claims, numbers with no source. If you can't verify
+  them: never add `Review`/`AggregateRating` schema for them, **ask the user whether they're genuine**, and
+  if they're invented, say plainly that this is a **misleading-advertising / consumer-law risk**, not just
+  an SEO problem — then offer to remove, label, or replace with real content. This is the butler being an
+  honest advisor rather than just an optimizer.
 
 ## Strategy mode (optional — only when the orchestrator asks for it)
 When the strategy phase is approved, follow **`strategy.md`** end to end: research keywords from free web
 signals (autocomplete, "People Also Ask", related searches via WebSearch), classify by intent, cluster and
 map to existing pages or gaps, and analyze competitor coverage. This phase is **keyless** — produce
 qualitative demand signals (high/med/low), **never fabricated volumes**. Present auto-detected competitors
-as guesses the user can correct. Write `./.seo-butler/strategy.md` and feed the findings into item 21
-(which term each page owns; cannibalization) and item 18 (recommended topics). **Recommend topics; never
+as guesses the user can correct. Write `./.seo-butler/strategy.md` and feed the findings into item 24
+(which term each page owns; cannibalization) and item 21 (recommended topics). **Recommend topics; never
 write the articles.** This is advisory — it's not part of the fixed checklist.
 
 ## Staying current

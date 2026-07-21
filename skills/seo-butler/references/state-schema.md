@@ -40,6 +40,9 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
     "robots_hygiene":    { "status": "done",    "date": "2026-07-19" },
     "url_quality":       { "status": "done",    "date": "2026-07-19" },
     "broken_links":      { "status": "done",    "date": "2026-07-19", "scope": "0 internal broken; 2 external flagged (report-only)" },
+    "edge_robots_check": { "status": "done",    "date": "2026-07-19", "notes": "live robots.txt matched origin (no CDN override)" },
+    "canonical_link_consistency": { "status": "done", "date": "2026-07-19", "notes": "rendered internal links all point at canonical" },
+    "stale_public_files":{ "status": "partial", "notes": "21 legacy mockups under /html/ — Disallow added, deletion recommended" },
     "ai_crawlability":   { "status": "done",    "date": "2026-07-19", "notes": "robots allows GPTBot/ClaudeBot/PerplexityBot/Google-Extended; SSR ok" },
     "answer_first":      { "status": "done",    "date": "2026-07-19", "scope": "5 key pages restructured" },
     "semantic_html":     { "status": "done",    "date": "2026-07-19" },
@@ -48,6 +51,7 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
     "llms_txt":          { "status": "done",    "date": "2026-07-19", "notes": "created; low real-world weight in 2026 — nice-to-have" },
     "internal_linking":  { "status": "done",    "date": "2026-07-19", "scope": "1 orphan fixed; 4 contextual links added (approved)" },
     "keyword_optimization": { "status": "done", "date": "2026-07-19", "scope": "12/12 pages targeted; 1 cannibalization flagged" },
+    "content_authenticity": { "status": "done", "date": "2026-07-19", "notes": "10 fabricated testimonials found; user chose removal" },
     "core_web_vitals":   { "status": "partial", "notes": "LCP image flagged; fix reported" },
     "image_optimization":{ "status": "done",    "date": "2026-07-19" },
     "render_blocking":   { "status": "partial", "notes": "1 blocking script reported" },
@@ -60,6 +64,13 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
   "scoreHistory": [
     { "date": "2026-07-19", "before": 38, "after": 91 }
   ],
+  "deploy": {
+    "deployedAt": null,
+    "liveVerifiedAt": null,
+    "liveUrl": "https://example.com",
+    "liveScore": null,
+    "openFindings": []
+  },
   "strategy": {
     "lastRun": "2026-07-19",
     "clusters": [
@@ -75,11 +86,14 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
 ```
 
 > The `strategy` block is **separate from the fixed checklist**. Strategy is an optional, advisory
-> deliverable — it is NOT one of the 29 `items`. It exists only after the user has run the strategy
+> deliverable — it is NOT one of the 33 `items`. It exists only after the user has run the strategy
 > phase; omit it entirely on runs where strategy wasn't approved.
 
 ## Rules
 - The `items` keys are **fixed** and mirror `checklist.md`. Never add ad-hoc keys.
+- The `deploy` block tracks **applied vs live**. `items` being `done` only means the change is in the
+  codebase; until `liveVerifiedAt` is set by `/seo-live`, nothing has been proven in production and search
+  engines may still see none of it. Keep `openFindings` populated while live issues remain unresolved.
 - On each run: read → treat `done`/`n/a` as settled → only re-open items whose scope changed
   (e.g. `pageCount` grew, new routes) or that are `partial`/`todo`.
 - After applying, update every touched item's `status`, `date`, `scope`, `notes`, and append to

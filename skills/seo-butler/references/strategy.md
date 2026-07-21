@@ -1,12 +1,12 @@
 # Strategy Playbook — keyword research & competitor analysis (keyless)
 
-This is the **optional strategy phase**. Unlike the fixed 29-item checklist (things the butler *applies*
+This is the **optional strategy phase**. Unlike the fixed 33-item checklist (things the butler *applies*
 to the code), strategy is **advisory**: it researches what the site should target and hands back a plan.
 It runs only when the user approves the strategy line in the plan, because web research is slow and
 token-heavy — don't run it on every pass.
 
 Owner: the `seo-geo-content` specialist. Output: `./.seo-butler/strategy.md` + a summary in the score
-card. Findings feed checklist item 21 (on-page keyword targeting) and item 18 (content suggestions).
+card. Findings feed checklist item 24 (on-page keyword targeting) and item 21 (content suggestions).
 
 ## The honesty rule (read first)
 We have **no paid keyword data source** (this phase is keyless). That means you can produce real keyword
@@ -43,11 +43,11 @@ signals — clearly labeled as an estimate, never a fabricated number.
 
 ## Step 3 — Cluster & map to pages
 Group the keywords into **topic clusters** (one clear intent per cluster). For each cluster:
-- If an existing page already targets it → note the page (this feeds item 21: make that page own the term).
-- If nothing targets it → mark it a **gap** and add a recommended new page/topic (feeds item 18; you
+- If an existing page already targets it → note the page (this feeds item 24: make that page own the term).
+- If nothing targets it → mark it a **gap** and add a recommended new page/topic (feeds item 21; you
   recommend, you don't write it).
 Flag **cannibalization**: two existing pages competing for the same cluster → recommend consolidating or
-differentiating (also item 21).
+differentiating (also item 24).
 
 ## Step 4 — Competitor analysis
 - **Identify competitors:** search the site's core topic/keywords and pick the few sites that repeatedly
@@ -81,8 +81,8 @@ Deterministic, human-readable. Suggested structure:
 ```
 
 ## Step 6 — Hand off to the applied work
-- Feed **item 21**: which primary term each existing page should own; which cannibalizations to fix.
-- Feed **item 18**: the recommended new topics become content suggestions in the score card.
+- Feed **item 24**: which primary term each existing page should own; which cannibalizations to fix.
+- Feed **item 21**: the recommended new topics become content suggestions in the score card.
 - Any actual on-page edits still go through the plan and the body-copy approval boundary (see `safety.md`).
 - Record a compact summary in `state.json`'s `strategy` block (see `state-schema.md`) so a later run can
   refresh rather than redo the research.

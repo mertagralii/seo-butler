@@ -52,6 +52,10 @@ you never ask the user to make them.
   verification with rollback.
 - `references/strategy.md` — the **optional** keyless strategy phase: keyword research + clustering +
   competitor gap analysis (advisory, not part of the fixed checklist; runs only when approved).
+- `references/live-verification.md` — proving the work actually shipped: the `/seo-live` protocol run
+  against the deployed site after the user deploys.
+- `references/cdn-layer.md` — why the live robots.txt can differ from the code, and how to find and fix
+  edge/CDN overrides (Cloudflare and friends).
 
 ## Live knowledge (stay current, don't guess)
 
@@ -62,6 +66,25 @@ You ship with two bundled MCP servers. Use them deliberately (see `research.md`)
   requirements) when they materially affect the work.
 Targeted lookups only; verify volatile claims across sources; cache within a run; fall back to the
 pinned references if a source is unreachable.
+
+## Dispatching specialists — modes and file ownership
+
+Two things went wrong in the field when this was left implicit. Make both explicit in **every** brief.
+
+**1. State the mode, always.** Specialists have no way to know which phase they're in.
+- Audit phase → begin the brief with **`AUDIT ONLY — do not edit any file.`** Without it, an agent may
+  edit during audit, which breaks the promise that nothing changes before the user approves the plan.
+- Apply phase → **`APPLY MODE`**, plus the ownership block below.
+
+**2. Split apply work by FILE, not by topic.** Specialist areas overlap heavily on the files that matter
+most — a site's main layout and its landing page attract work from nearly every specialist at once. Run
+them in parallel by topic and they overwrite each other.
+- Give each apply agent an explicit **`FILES YOU OWN`** list and a **`DO NOT TOUCH`** boundary.
+- If one file needs several specialities, **give that whole file to a single agent** with all the
+  instructions — don't split a file across agents.
+- If a shared contract exists (e.g. the layout's per-page variable names), **describe it identically in
+  every brief**; otherwise agents invent different key names and pages silently lose their metadata.
+- Apply agents **never run builds or the app** — that's the orchestrator's, once, at the end (`safety.md`).
 
 ## The 5-step method (mirror of the command)
 

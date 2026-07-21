@@ -6,31 +6,45 @@ and feels the work is complete — without needing SEO knowledge.
 ## Scoring (0–100)
 Weight the fixed checklist by real impact (aligned with `geo.md`'s honest tiers). Suggested weights (sum 100):
 
-- Titles + meta descriptions — 10
-- robots.txt + sitemap.xml — 9
-- Canonical / robots hygiene — 7
-- Structured data (JSON-LD) — 10
-- Open Graph + Twitter — 6
-- Broken links (internal integrity) — 4
-- **On-page: keyword / topic targeting** — 6
+- Titles + meta descriptions — 9
+- robots.txt + sitemap.xml — 8
+- Canonical / robots hygiene — 6
+- Structured data (JSON-LD) — 9
+- Open Graph + Twitter — 5
+- Broken links (internal integrity) — 3
+- **Edge/CDN robots override** — 5  *(when it bites, it overrides everything else)*
+- **Canonical ↔ internal-link consistency** — 3
+- Stale/orphan public files — 2
+- **On-page: keyword / topic targeting** — 5
 - **On-page: internal linking** — 4
-- **GEO: AI crawlability** (citation bots allowed + key content SSR'd) — 9  *(Tier 1, high impact)*
-- **GEO: answer-first structure + semantic HTML + AI readiness** — 8  *(Tier 2)*
+- **Content authenticity** — 3
+- **GEO: AI crawlability** (citation bots allowed + key content SSR'd) — 8  *(Tier 1, high impact)*
+- **GEO: answer-first structure + semantic HTML + AI readiness** — 7  *(Tier 2)*
 - **GEO: llms.txt** — 2  *(Tier 6, minor — see honesty note)*
 - Content suggestions (evidence/freshness recommendations) — 2
-- Image alt / accessibility — 5
-- Core Web Vitals / performance — 9
-- Search Console — 5
-- Analytics (GA4) — 4
+- Image alt / accessibility — 4
+- Core Web Vitals / performance — 8
+- Search Console — 4
+- Analytics (GA4) — 3
 
 Score = sum of weights for `done` items + half weight for `partial`. `n/a` items are removed from
 the denominator and the total is renormalized to 100. Compute a **before** (initial audit) and an
 **after** (post-apply) score.
 
+**Report two scores, never one.**
+- **Applied score** — computed as above from what's now in the codebase.
+- **Live score** — the same computation re-run against the **deployed** site after `/seo-live`
+  (`live-verification.md`). Until that has happened, show `—` and say so.
+
+This distinction matters: a high applied score means the code is right, **not** that search engines see
+anything. Work that is applied but never deployed has zero effect, and defects that only appear in
+rendered output (encoded JSON-LD, non-canonical link generation, a CDN shadowing robots.txt) are still
+undetected. Never let "91" read as "done and working."
+
 > Honesty note: llms.txt is weighted low on purpose — as of 2026 no major AI engine officially
 > consumes it. Don't let a high score imply AI-citation is guaranteed; the score reflects *setup
 > quality*, not promised placement. Where possible, corroborate with real tools (Lighthouse, Rich
-> Results / schema validators) rather than self-assessment — that's the Phase-3 direction.
+> Results / schema validators) rather than self-assessment.
 
 ## Report layout
 
@@ -38,7 +52,8 @@ the denominator and the total is renormalized to 100. Compute a **before** (init
 🏁 SEO/GEO Butler — Score Card
 Project: <stack> · <N> pages · <first run / re-run>
 
-Score:  38 → 91   ▲ +53
+Applied score:  38 → 91   ▲ +53
+Live score:     — (not verified yet — deploy, then run /seo-live)
 
 ✅ Done this run
   • Sitemap with 12 URLs + robots.txt

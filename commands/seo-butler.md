@@ -124,8 +124,8 @@ If the user approved the **🔍 Strategy** line (or asked for strategy / passed 
 strategy phase via `seo-geo-content` in strategy mode, following `${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/
 references/strategy.md`. It's **keyless**: keyword ideas + intent + clustering + competitor gaps from free
 web signals — **no fabricated volumes** (qualitative high/med/low). Auto-detected competitors are shown
-for the user to correct. Output: `./.seo-butler/strategy.md`; findings feed item 21 (on-page keyword
-targeting) and item 18 (content suggestions). If not approved, skip it and note "Strategy: skipped (opt-in)".
+for the user to correct. Output: `./.seo-butler/strategy.md`; findings feed item 24 (on-page keyword
+targeting) and item 21 (content suggestions). If not approved, skip it and note "Strategy: skipped (opt-in)".
 
 ### 5. Report + remember
 - Write/update `./.seo-butler/state.json` per the skill's `state-schema` (status, date, scope,
@@ -133,6 +133,13 @@ targeting) and item 18 (content suggestions). If not approved, skip it and note 
 - Show a **SEO Score Card** in the skill's `scorecard` format: before → after score, what changed
   and why, plus the GEO **content suggestions** from `seo-geo-content`.
 - If nothing was missing on a re-run, say so honestly: "Everything is current ✅ — nothing new to do."
+- **Hand off to live verification.** Applied ≠ live: until the changes are deployed, search engines see
+  none of them, and defects that only appear in rendered output (encoded JSON-LD, non-canonical link
+  generation, a CDN shadowing robots.txt) are still invisible. So close every run that changed something
+  with an explicit next step:
+  > *"Bu değişiklikler uygulandı ama henüz yayında değil. Commit + push edip canlıya aldıktan sonra
+  > `/seo-live` çalıştır — canlı siteni test edip gerçekten çalıştığını doğrulayayım."*
+  On a re-run, if `state.json` shows applied work that has never been live-verified, remind them again.
 
 ## Notes
 - If `$ARGUMENTS` is provided (e.g. "only sitemap", "skip analytics"), treat it as a scope hint for
