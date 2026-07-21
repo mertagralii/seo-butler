@@ -85,6 +85,18 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
       { "what": "crux", "reason": "no field data yet — site is new / low traffic" }
     ]
   },
+  "watch": {
+    "lastCheckedAt": "2026-07-22",
+    "history": [
+      { "date": "2026-07-22", "status": "stable", "findings": [] },
+      { "date": "2026-07-15", "status": "regression", "findings": [
+        { "what": "robots.txt changed at the edge", "severity": "high", "since": "2026-07-08" }
+      ] }
+    ],
+    "skipped": [
+      { "what": "search-console", "reason": "no logged-in browser in unattended run" }
+    ]
+  },
   "strategy": {
     "lastRun": "2026-07-19",
     "clusters": [
@@ -108,6 +120,10 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
 - The `deploy` block tracks **applied vs live**. `items` being `done` only means the change is in the
   codebase; until `liveVerifiedAt` is set by `/seo-live`, nothing has been proven in production and search
   engines may still see none of it. Keep `openFindings` populated while live issues remain unresolved.
+- The `watch` block is written by `/seo-watch` (`monitoring.md`) and is the **only** thing that command
+  writes — it never edits the user's code. Its `history` gives each check a baseline to diff against, and
+  `skipped` records what couldn't be checked (e.g. Search Console with no logged-in browser) so a gap is
+  never mistaken for a pass.
 - The `measurements` block holds **externally produced numbers only** (`measurement.md`) — never the
   butler's own estimates. Whatever couldn't be measured goes in `unavailable` **with its reason**, so a
   later run shows an honest gap rather than a silent one. Keeping history here lets you show movement

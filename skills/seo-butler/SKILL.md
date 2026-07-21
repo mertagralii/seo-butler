@@ -58,6 +58,8 @@ you never ask the user to make them.
   edge/CDN overrides (Cloudflare and friends).
 - `references/measurement.md` — real numbers from real tools: schema validation, Lighthouse (PSI or local),
   CrUX field data, Search Console. Independent verdicts instead of marking our own homework.
+- `references/monitoring.md` — the read-only `/seo-watch` watchdog: periodic regression checks against the
+  stored baseline, with noise thresholds. It reports; it never changes anything.
 
 ## Live knowledge (stay current, don't guess)
 
@@ -68,6 +70,15 @@ You ship with two bundled MCP servers. Use them deliberately (see `research.md`)
   requirements) when they materially affect the work.
 Targeted lookups only; verify volatile claims across sources; cache within a run; fall back to the
 pinned references if a source is unreachable.
+
+## The three commands
+
+- **`/seo-butler`** — the main run: audit → plan → approve → apply → verify. Changes code, always with approval.
+- **`/seo-live`** — after the user deploys: prove it works in production and measure it with real tools.
+  Can lead into a supervised fix cycle.
+- **`/seo-watch`** — the read-only watchdog for scheduled/unattended runs. Diffs live reality against the
+  stored baseline and reports regressions. **Never changes anything**, because nobody is there to approve
+  a plan; it hands off to the other two.
 
 ## Dispatching specialists — modes and file ownership
 

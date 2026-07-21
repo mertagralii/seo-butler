@@ -47,28 +47,58 @@ yok) · sonunda içerik önerileriyle bir **SEO Skor Kartı**.
 /plugin install seo-butler
 ```
 
-Claude Code'u yeniden başlat, sonra herhangi bir web projesinde:
+Claude Code'u yeniden başlat. Plugin **genel** olarak kurulur (her projede kullanılabilir), ama yalnızca
+komutu çalıştırdığın projede iş yapar.
 
-```
-/seo-butler
-```
+## Komutlar
+
+Üç komut, üç farklı an:
+
+| Komut | Ne zaman | Ne yapar | Kodunu değiştirir mi? |
+|---|---|---|---|
+| **`/seo-butler`** | Siteni bitirince | Projeyi tanır, planı sunar, onayınla tüm SEO/GEO işini yapar | ✅ Evet — **her zaman onayınla** |
+| **`/seo-live`** | Canlıya aldıktan sonra | Canlı siteyi çeker, gerçekten çalıştığını kanıtlar, Lighthouse/CrUX ile ölçer | ⚠️ Sorun bulursa düzeltmeyi *önerir* (yine onayla) |
+| **`/seo-watch`** | Periyodik (ör. haftalık) | Salt-okunur nöbetçi — regresyon var mı diye bakar, raporlar | ❌ **Asla** |
 
 İsteğe bağlı kapsam ipucu: `/seo-butler skip analytics` veya `/seo-butler only sitemap`.
 
-### Sonra: canlıda doğrula
+**Neden `/seo-live` ayrı?** Uygulanmış olmak yayında olmak değildir. Bazı hatalar yalnızca render edilmiş
+çıktıda görünür: template engine JSON-LD'ni bozabilir, CDN robots.txt'ini gölgeleyebilir, framework
+canonical olmayan link üretebilir. Bunlar repoda görünmez — sadece canlıyı çekince ortaya çıkar.
 
-Uygulanmış olmak yayında olmak değildir. Commit + push edip **canlıya aldıktan sonra**:
+**Neden `/seo-watch` hiçbir şeyi değiştirmiyor?** Çünkü sen başında değilken çalışır. Bu plugin'in en
+güçlü vaadi "siteni bozmam" ve bunu koruyan şey **her değişikliğin önce plana girip onaydan geçmesi**.
+Gözetimsiz düzeltme o zinciri kırardı. Bekçi havlar, ısırmaz.
 
-```
-/seo-live
-```
+## Nasıl çalışır?
 
-Canlı siteni çeker ve gerçekten çalıştığını kanıtlar: CDN'in robots.txt'ini gölgeleyip gölgelemediği,
-JSON-LD'nin render'da bozulup bozulmadığı, iç linklerin canonical'ı gösterip göstermediği, analytics'in
-gerçekten ateşlenip ateşlenmediği (Playwright ile). Ayrıca **gerçek araçlarla ölçer**: Lighthouse skorları
-(PageSpeed Insights), **CrUX gerçek kullanıcı verisi** ve Search Console — kendi puanı değil, bağımsız
-verdikt. Sorun bulursa kod tarafını düzeltmeyi önerir, panel
-tarafı içinse seni dashboard'da yönlendirir — **canlı temiz olana kadar döngü kapanmaz.**
+`/seo-butler` yazdığında beş aşama işler:
+
+**1. Keşfet** — Tüm projeyi tarar: hangi framework (Next.js/Astro/ASP.NET/Django…), kaç sayfa, site ne
+hakkında. Daha önce çalıştıysa `.seo-butler/state.json` hafızasını okur.
+
+**2. Karar ver** — **Sabit 33 maddelik** kontrol listesine göre eksikleri bulur. 5 uzman ajan
+(teknik SEO · on-page & GEO · performans · erişilebilirlik · analitik) **paralel** denetim yapar.
+Bu aşamada hiçbir dosyaya dokunulmaz. Sana SEO sorusu **sorulmaz** — kararları butler verir.
+
+**3. Plan sun** — Ne yapacağını madde madde gösterir: **[Onayla] [Düzenle] [Reddet]**.
+Sen onaylamadan tek bir dosya değişmez.
+
+**4. Uygula (güvenle)** — Önce git durumunu kontrol edip yedek alır. Sonra onayladıklarını uygular —
+her ajan yalnızca **sahibi olduğu dosyalara** dokunur, mevcut etiketleri ezmez (tekrar çalıştırınca çift
+etiket olmaz). Ardından **doğrular**: build/lint çalıştırır, uygulamayı ayağa kaldırıp sayfaları HTTP ile
+çeker, ürettiği XML/JSON-LD geçerli mi bakar. Bir şey bozulduysa **o değişikliği geri alır.**
+
+**5. Raporla + hatırla** — Skor kartı verir (bizim kapsam puanımız + gerçek araç ölçümleri **ayrı ayrı**,
+asla harmanlanmadan), yaptıklarını `state.json`'a yazar ve seni bir sonraki adıma yönlendirir:
+*"deploy edip `/seo-live` çalıştır."*
+
+Sonra döngü: **deploy et → `/seo-live` ile kanıtla → periyodik `/seo-watch` ile nöbet tut.**
+
+### Hafıza — neden tekrar çalıştırmak güvenli?
+Butler yaptığı her şeyi `.seo-butler/state.json`'a yazar. İkinci kez çalıştırdığında önce onu okur:
+zaten yapılmışları **tekrar önüne getirmez**, sadece gerçekten değişeni (yeni sayfa, yarım kalmış madde)
+ele alır. Sahada doğrulandı: ilk koşu ~1.07M token, ikinci koşu **~6K token** — çünkü kısa devre yaptı.
 
 ## Paneller (Search Console / Analytics)
 
@@ -128,13 +158,57 @@ volumes) · a final **SEO Score Card** with content ideas.
 /plugin install seo-butler
 ```
 
-Restart Claude Code, then in any web project:
+Restart Claude Code. The plugin installs **globally** (available in every project) but only ever acts on
+the project you run the command in.
 
-```
-/seo-butler
-```
+## Commands
+
+Three commands, three moments:
+
+| Command | When | What it does | Changes your code? |
+|---|---|---|---|
+| **`/seo-butler`** | Once the site is built | Understands the project, shows a plan, does all the SEO/GEO work on approval | ✅ Yes — **always with your approval** |
+| **`/seo-live`** | After you deploy | Fetches the live site, proves the work shipped and works, measures with Lighthouse/CrUX | ⚠️ *Offers* fixes for what it finds (again, with approval) |
+| **`/seo-watch`** | Periodically (e.g. weekly) | Read-only watchdog — checks for regressions and reports | ❌ **Never** |
 
 Optional scope hint: `/seo-butler skip analytics` or `/seo-butler only sitemap`.
+
+**Why is `/seo-live` separate?** Applied is not the same as live. Some defects only exist in rendered
+output: a template engine can mangle your JSON-LD, a CDN can shadow your robots.txt, a framework can emit
+non-canonical links. None of that is visible in the repo — only in what the server actually returns.
+
+**Why does `/seo-watch` never change anything?** Because it runs while you're not there. This plugin's
+strongest promise is "I won't break your site", and what protects that is **every change going through a
+plan you approve**. An unsupervised fix would break the chain. The watchdog barks; it doesn't bite.
+
+## How it works
+
+`/seo-butler` runs five stages:
+
+**1. Discover** — Scans the whole project: which framework (Next.js/Astro/ASP.NET/Django…), how many
+pages, what the site is about. On a re-run it first reads the `.seo-butler/state.json` memory.
+
+**2. Decide** — Works the **fixed 33-item checklist** to find what's missing. Five specialists
+(technical SEO · on-page & GEO · performance · accessibility · analytics) audit **in parallel**. No file
+is touched in this stage, and you are never asked an SEO question — the butler decides.
+
+**3. Present the plan** — Item by item, with **[Approve] [Edit] [Reject]**. Nothing changes until you approve.
+
+**4. Apply (safely)** — Takes a git-aware backup first. Each agent edits only the **files it owns** and
+updates existing tags in place (so re-runs never duplicate). Then it **verifies**: build/lint, plus
+starting the app and fetching the pages over HTTP to check the *rendered* output and generated artifacts.
+Anything that regresses is **rolled back**.
+
+**5. Report + remember** — A score card (our coverage score and the real-tool measurements shown
+**separately**, never blended), the work written to `state.json`, and a hand-off:
+*"deploy, then run `/seo-live`."*
+
+Then the loop: **deploy → prove it with `/seo-live` → keep watch with `/seo-watch`.**
+
+### Memory — why re-running is safe
+The butler records everything it did in `.seo-butler/state.json` and reads it first on the next run, so
+completed items are never re-proposed; only real deltas (new pages, unfinished items) come back. Verified
+in the field: first run ~1.07M tokens, second run **~6K** — because it short-circuits.
 
 ### Then: verify it live
 
@@ -151,6 +225,21 @@ scores (PageSpeed Insights), **CrUX real-user data** and Search Console — inde
 marking. Code-side findings get the normal plan → approve →
 apply flow; panel/CDN findings are walked through in your dashboard — **the loop stays open until live is clean.**
 
+### And after that: keep watch
+
+Code doesn't rot on its own, but **live sites do** — a CDN setting flips, a deploy drops a tag, a page
+falls out of the index, a teammate ships pages with no metadata. Periodically (weekly is a sensible default):
+
+```
+/seo-watch
+```
+
+**A read-only watchdog: it changes nothing.** Because it runs unattended — with nobody there to approve a
+plan — it only diffs live reality against the baseline in `state.json` and reports **meaningful** changes,
+with noise thresholds (any robots.txt change, a Lighthouse drop of ≥5 points, a Core Web Vital crossing a
+threshold). If it finds something it hands the fix back to you: *"run `/seo-butler`."* If all is well, one
+line: *"stable ✅"*.
+
 ## Dashboards (Search Console / Analytics)
 
 Google blocks automated logins, so the butler works inside **your already-logged-in Chrome
@@ -162,14 +251,21 @@ half-done. Browser automation ships via the bundled Playwright MCP.
 
 ```
 .claude-plugin/   plugin.json, marketplace.json
-commands/         seo-butler.md (main) + seo-live.md (post-deploy verification)
+commands/         seo-butler.md (main) · seo-live.md (post-deploy) · seo-watch.md (read-only watchdog)
 agents/           the specialist team (5)
 skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard,
-                  research, safety, strategy, live-verification, cdn-layer, measurement)
+                  research, safety, strategy, live-verification, cdn-layer, measurement, monitoring)
 .mcp.json         bundled Playwright + context7 MCPs
 ```
 
 ## Status
+
+**v0.9.0 — the watchdog.** Adds **`/seo-watch`**: a read-only periodic regression check that diffs the
+live site against the baseline in `state.json` and reports what changed — any robots.txt drift (the
+de-indexing risk), routes that stopped responding, missing artifacts, broken JSON-LD, Lighthouse/CrUX
+drops, and pages shipped without the butler. It runs unattended, so by design it **never changes
+anything** and hands fixes back to `/seo-butler` / `/seo-live`. Noise thresholds keep it quiet when
+things are fine.
 
 **v0.8.0 — real-tool scoring.** The butler no longer marks its own homework. `/seo-live` now produces
 **independent verdicts**: schema.org validation of every JSON-LD block, **Lighthouse** scores via the
