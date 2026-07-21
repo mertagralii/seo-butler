@@ -71,6 +71,9 @@ So for any server-rendered or templated stack (and whenever a local run is possi
    - sitemap: valid XML, no BOM (check the bytes);
    - analytics tag present only in the intended environment.
 4. **If you can't run it, say so explicitly — never imply it was verified.**
+5. *Optional while the local server is up:* run Lighthouse against it for early lab scores
+   (`measurement.md`). Skip without ceremony if no browser is available — the real measurement happens
+   against the deployed site in `/seo-live`, where CrUX field data is also available.
 
 Local runtime verification proves it works on your machine. Proving it works *in production* is a separate
 step the user triggers after deploying — see `live-verification.md` and the `/seo-live` command.

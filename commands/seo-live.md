@@ -12,8 +12,9 @@ generation emits non-canonical URLs, deploys land half-finished. None of that is
 
 ## Load your protocol
 Read **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/references/live-verification.md`** and follow it end to
-end. You'll also want `cdn-layer.md` (edge overrides), `standards.md` (thresholds), `state-schema.md`
-(where to record results), and `scorecard.md` (how to report). The `seo-butler` skill has the full picture.
+end, plus **`measurement.md`** (real-tool scoring: Lighthouse/PSI, CrUX, schema validation). You'll also
+want `cdn-layer.md` (edge overrides), `standards.md` (thresholds), `state-schema.md` (where to record
+results), and `scorecard.md` (how to report). The `seo-butler` skill has the full picture.
 
 **You own this verification yourself** — don't farm it out to the apply specialists. Verification is
 centralized in the orchestrator (see `safety.md`).
@@ -35,15 +36,26 @@ centralized in the orchestrator (see `safety.md`).
    - **Browser (Playwright)** — JS-rendered content visible, analytics request actually firing, load
      behavior and console errors, screenshot for the record.
 
-3. **Report findings in two buckets**, because they're fixed in different places:
+3. **Measure with real tools** — follow `measurement.md`. Now that a public URL exists, get independent
+   verdicts instead of self-assessment:
+   - **Always:** deterministic validation (parse every JSON-LD block and check schema.org required fields;
+     sitemap XML; robots).
+   - **Lighthouse via the PageSpeed Insights API** — one call returns both the lab scores *and* CrUX field
+     data, no local browser needed. Mobile strategy first. Home page + 2–3 pages that matter.
+   - **Opportunistic:** CrUX real-user metrics (same response) and Search Console's own view via the
+     logged-in browser.
+   Anything you can't measure is reported as unavailable **with the reason** — never estimated.
+
+4. **Report findings in two buckets**, because they're fixed in different places:
    - **Code-side** → offer the normal butler flow: plan → approval → apply. When done, tell the user:
      *"Tekrar deploy et, sonra `/seo-live` ile beni yine çağır."*
    - **Panel / CDN-side** → not in the repo. Walk them through their provider's dashboard in their own
      logged-in browser (`cdn-layer.md`), then **re-fetch to confirm it took effect**.
 
-4. **Update state and report.** Write the `deploy` block in `.seo-butler/state.json` (`deployedAt`,
-   `liveVerifiedAt`, `liveUrl`, findings, live score) and show the score card with **both** numbers —
-   applied vs live — so a high "applied" score is never mistaken for "live and working".
+5. **Update state and report.** Write the `deploy` and `measurements` blocks in `.seo-butler/state.json`,
+   then show the score card as **separate, labelled blocks** (`scorecard.md`): butler coverage, Lighthouse
+   (lab), CrUX (real users), Search Console. Never blend them into one number — they answer different
+   questions, and a high coverage score is not evidence the site is fast or indexed.
 
 ## Rules
 - Reply in the user's language.

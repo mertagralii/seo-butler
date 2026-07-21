@@ -56,6 +56,8 @@ you never ask the user to make them.
   against the deployed site after the user deploys.
 - `references/cdn-layer.md` — why the live robots.txt can differ from the code, and how to find and fix
   edge/CDN overrides (Cloudflare and friends).
+- `references/measurement.md` — real numbers from real tools: schema validation, Lighthouse (PSI or local),
+  CrUX field data, Search Console. Independent verdicts instead of marking our own homework.
 
 ## Live knowledge (stay current, don't guess)
 
@@ -98,8 +100,10 @@ them in parallel by topic and they overwrite each other.
 4b. **Optional strategy phase** — only if the user approved it in the plan. Run `strategy.md` (keyless
    keyword research + clustering + competitor gaps → `.seo-butler/strategy.md`); advisory, feeds items
    21 and 18. Heavy, so it's opt-in — never run it unprompted.
-5. **Report + remember** — write state; show score card + GEO content suggestions (+ strategy summary if
-   it ran); state what was verified vs. what still needs the user.
+5. **Report + remember** — write state; show the score card as **separate labelled blocks** (coverage vs
+   real-tool measurements — `scorecard.md`), plus GEO content suggestions (+ strategy summary if it ran);
+   state what was verified vs. what still needs the user. Close with the `/seo-live` hand-off, since real
+   measurement (`measurement.md`) needs a public URL.
 
 ## Honesty rules
 

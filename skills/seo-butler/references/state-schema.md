@@ -71,6 +71,20 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
     "liveScore": null,
     "openFindings": []
   },
+  "measurements": {
+    "measuredAt": "2026-07-22",
+    "source": "psi",
+    "strategy": "mobile",
+    "lighthouse": [
+      { "url": "/",        "performance": 78, "seo": 100, "accessibility": 94, "bestPractices": 92 },
+      { "url": "/pricing", "performance": 81, "seo": 100, "accessibility": 96, "bestPractices": 92 }
+    ],
+    "crux": { "lcp": "2.1s", "inp": "240ms", "cls": "0.05", "note": null },
+    "searchConsole": { "discovered": 5, "indexed": 1 },
+    "unavailable": [
+      { "what": "crux", "reason": "no field data yet — site is new / low traffic" }
+    ]
+  },
   "strategy": {
     "lastRun": "2026-07-19",
     "clusters": [
@@ -94,6 +108,10 @@ the butler consistent: it reads this first, trusts `done` items, and only acts o
 - The `deploy` block tracks **applied vs live**. `items` being `done` only means the change is in the
   codebase; until `liveVerifiedAt` is set by `/seo-live`, nothing has been proven in production and search
   engines may still see none of it. Keep `openFindings` populated while live issues remain unresolved.
+- The `measurements` block holds **externally produced numbers only** (`measurement.md`) — never the
+  butler's own estimates. Whatever couldn't be measured goes in `unavailable` **with its reason**, so a
+  later run shows an honest gap rather than a silent one. Keeping history here lets you show movement
+  over time instead of re-measuring from zero.
 - On each run: read → treat `done`/`n/a` as settled → only re-open items whose scope changed
   (e.g. `pageCount` grew, new routes) or that are `partial`/`todo`.
 - After applying, update every touched item's `status`, `date`, `scope`, `notes`, and append to

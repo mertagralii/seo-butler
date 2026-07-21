@@ -31,15 +31,34 @@ Score = sum of weights for `done` items + half weight for `partial`. `n/a` items
 the denominator and the total is renormalized to 100. Compute a **before** (initial audit) and an
 **after** (post-apply) score.
 
-**Report two scores, never one.**
-- **Applied score** — computed as above from what's now in the codebase.
-- **Live score** — the same computation re-run against the **deployed** site after `/seo-live`
-  (`live-verification.md`). Until that has happened, show `—` and say so.
+## Report separate, labelled blocks — never one blended number
 
-This distinction matters: a high applied score means the code is right, **not** that search engines see
-anything. Work that is applied but never deployed has zero effect, and defects that only appear in
-rendered output (encoded JSON-LD, non-canonical link generation, a CDN shadowing robots.txt) are still
-undetected. Never let "91" read as "done and working."
+Four different questions, four answers. Blending them produces a number that means nothing:
+
+| Block | Answers | Source |
+|---|---|---|
+| **Coverage** | "Did the butler do the work?" | the weighted checklist above |
+| **Live verified** | "Is it actually deployed and intact?" | `/seo-live` (`live-verification.md`) |
+| **Lighthouse (lab)** | "Is the page technically good?" | Google's auditor via PSI / local (`measurement.md`) |
+| **Real users (CrUX field)** | "What do real visitors experience?" | Chrome UX Report — needs live traffic |
+| **Search Console** | "What does Google actually think?" | the user's verified property |
+
+After `/seo-live` has run, the header looks like:
+```
+Coverage (butler checklist):   38 → 95
+Live verified:                 ✅ 2026-07-22
+Lighthouse (live, lab, mobile): SEO 100 · Perf 78 · A11y 94 · BP 92   [home, /pricing, /blog]
+Real users (CrUX field):        LCP 2.1s ✅ · INP 240ms ⚠️ · CLS 0.05 ✅
+Search Console:                 5 pages discovered · 1 indexed
+```
+
+**Rules that keep this honest:**
+- A high coverage score means the code is right — **not** that search engines see anything. Work that is
+  applied but never deployed has zero effect.
+- **Lab ≠ field.** Label which is which; never average them.
+- Anything unmeasured shows the **reason**, not a guess: *"CrUX: no data yet — site is new / low traffic."*
+- Lighthouse performance bounces between runs; don't report small deltas as progress or regression.
+- Lighthouse SEO 100 means the technical basics pass, not that the site will rank. Say so.
 
 > Honesty note: llms.txt is weighted low on purpose — as of 2026 no major AI engine officially
 > consumes it. Don't let a high score imply AI-citation is guaranteed; the score reflects *setup
@@ -52,8 +71,10 @@ undetected. Never let "91" read as "done and working."
 🏁 SEO/GEO Butler — Score Card
 Project: <stack> · <N> pages · <first run / re-run>
 
-Applied score:  38 → 91   ▲ +53
-Live score:     — (not verified yet — deploy, then run /seo-live)
+Coverage (butler checklist):   38 → 91   ▲ +53   ← what I did
+Live verified:                 — (deploy, then run /seo-live)
+Lighthouse (lab):              — (measured on the live site)
+Real users (CrUX field):       — (measured on the live site)
 
 ✅ Done this run
   • Sitemap with 12 URLs + robots.txt

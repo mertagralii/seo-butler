@@ -26,6 +26,8 @@ her seferinde yeni sürprizlerle şaşırtmaz.
   yapı, kanıt) ve llms.txt gibi bir taktiğin hâlâ düşük etkili olduğu yeri açıkça söyler.
 - **Siteni bozmaz.** Düzenlemeden önce git-farkında yedek, tekrar çalıştırınca çift etiket yok, uygulama
   sonrası doğrulama (build/lint + geçerli XML/JSON-LD) ve bozulan her değişikliği geri alma.
+- **Kendi ödevini kendi notlamaz.** Gerçek araçlarla ölçer — Lighthouse, CrUX gerçek kullanıcı verisi,
+  schema doğrulaması, Search Console — ve ölçemediğini uydurmaz, sebebini yazar.
 - **Hatırlar.** `.seo-butler/state.json` yazar; sonraki çalıştırmada yalnızca değişeni ele alır.
 
 ### Kapsam
@@ -35,7 +37,7 @@ edge/CDN robots override tespiti · canonical↔iç link tutarlılığı · yeti
 **On-page**: iç linkleme, keyword/konu hedefleme (cannibalization dahil) · **GEO**: AI crawlability,
 cevap-önce yapı, semantic HTML, AI-cevap hazırlığı, llms.txt · görsel alt text & erişilebilirlik ·
 Core Web Vitals düzeltmeleri (LCP/INP/CLS, 2026 eşikleri) · Google Search Console · Google Analytics
-(GA4) · **opsiyonel Strateji fazı**: keyword araştırma + rakip analizi (anahtarsız — nitel sinyal, hacim
+(GA4) · **gerçek araçlarla ölçüm** (Lighthouse/PSI + CrUX + schema doğrulama) · **opsiyonel Strateji fazı**: keyword araştırma + rakip analizi (anahtarsız — nitel sinyal, hacim
 yok) · sonunda içerik önerileriyle bir **SEO Skor Kartı**.
 
 ## Kurulum
@@ -63,7 +65,9 @@ Uygulanmış olmak yayında olmak değildir. Commit + push edip **canlıya aldı
 
 Canlı siteni çeker ve gerçekten çalıştığını kanıtlar: CDN'in robots.txt'ini gölgeleyip gölgelemediği,
 JSON-LD'nin render'da bozulup bozulmadığı, iç linklerin canonical'ı gösterip göstermediği, analytics'in
-gerçekten ateşlenip ateşlenmediği (Playwright ile). Sorun bulursa kod tarafını düzeltmeyi önerir, panel
+gerçekten ateşlenip ateşlenmediği (Playwright ile). Ayrıca **gerçek araçlarla ölçer**: Lighthouse skorları
+(PageSpeed Insights), **CrUX gerçek kullanıcı verisi** ve Search Console — kendi puanı değil, bağımsız
+verdikt. Sorun bulursa kod tarafını düzeltmeyi önerir, panel
 tarafı içinse seni dashboard'da yönlendirir — **canlı temiz olana kadar döngü kapanmaz.**
 
 ## Paneller (Search Console / Analytics)
@@ -103,6 +107,8 @@ and never re-surprises you.
   answer-first structure, evidence) and tells you plainly where a tactic (like llms.txt) is still low-impact.
 - **Never breaks your site.** Git-aware backup before editing, idempotent re-runs (no duplicate tags),
   and post-apply verification (build/lint + valid XML/JSON-LD) that rolls back anything it regresses.
+- **Doesn't mark its own homework.** Real tools produce the numbers — Lighthouse, CrUX field data, schema
+  validation, Search Console — and anything it can't measure is reported with the reason, never guessed.
 - **Remembers.** Writes `.seo-butler/state.json`; next run only touches what changed.
 
 ### Covered
@@ -112,7 +118,7 @@ edge/CDN robots-override detection · canonical↔internal-link consistency · s
 **On-page**: internal linking, keyword/topic targeting (incl. cannibalization) · **GEO**: AI crawlability,
 answer-first structure, semantic HTML, AI-answer readiness, llms.txt · image alt text & a11y ·
 Core Web Vitals fixes (LCP/INP/CLS, 2026 thresholds) · Google Search Console · Google Analytics (GA4) ·
-an **optional Strategy phase**: keyword research + competitor analysis (keyless — qualitative signals, no
+**real-tool measurement** (Lighthouse/PSI + CrUX + schema validation) · an **optional Strategy phase**: keyword research + competitor analysis (keyless — qualitative signals, no
 volumes) · a final **SEO Score Card** with content ideas.
 
 ## Install
@@ -140,7 +146,9 @@ Applied is not the same as live. After you commit, push and **deploy**:
 
 It fetches the deployed site and proves the work is real: whether a CDN is shadowing your robots.txt,
 whether the template engine mangled your JSON-LD, whether rendered internal links point at the canonical
-URL, whether analytics actually fires (via Playwright). Code-side findings get the normal plan → approve →
+URL, whether analytics actually fires (via Playwright). It also **measures with real tools**: Lighthouse
+scores (PageSpeed Insights), **CrUX real-user data** and Search Console — independent verdicts, not our own
+marking. Code-side findings get the normal plan → approve →
 apply flow; panel/CDN findings are walked through in your dashboard — **the loop stays open until live is clean.**
 
 ## Dashboards (Search Console / Analytics)
@@ -157,11 +165,17 @@ half-done. Browser automation ships via the bundled Playwright MCP.
 commands/         seo-butler.md (main) + seo-live.md (post-deploy verification)
 agents/           the specialist team (5)
 skills/seo-butler SKILL.md + references/ (checklist, standards, geo, stacks, state, scorecard,
-                  research, safety, strategy, live-verification, cdn-layer)
+                  research, safety, strategy, live-verification, cdn-layer, measurement)
 .mcp.json         bundled Playwright + context7 MCPs
 ```
 
 ## Status
+
+**v0.8.0 — real-tool scoring.** The butler no longer marks its own homework. `/seo-live` now produces
+**independent verdicts**: schema.org validation of every JSON-LD block, **Lighthouse** scores via the
+PageSpeed Insights API (one call, no local browser), **CrUX real-user field data**, and Search Console's
+own view. Results are reported as **separate labelled blocks** — coverage vs lab vs field vs Google —
+never blended into one flattering number, and anything unmeasured shows the reason instead of a guess.
 
 **v0.7.0 — "field lessons"**, shaped by a full real-world run on a production ASP.NET Core site.
 Adds the **`/seo-live`** post-deploy verification command (applied ≠ live: the score card now reports
