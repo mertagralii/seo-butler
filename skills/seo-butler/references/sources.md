@@ -90,7 +90,8 @@ fact the butler holds, a new entrant costs the user real citations until robots.
 | 26 | LCP — definition, good/poor bands, common causes | https://web.dev/articles/lcp?hl=en |
 | 26 | INP — the metric that replaced FID | https://web.dev/articles/inp?hl=en |
 | 26 | CLS — definition and measurement window | https://web.dev/articles/cls?hl=en |
-| 26–28 | the PageSpeed Insights API `measurement.md` calls | https://developers.google.com/speed/docs/insights/v5/get-started?hl=en |
+| 26–28 | running Lighthouse locally from the CLI (rung 2 of `measurement.md`'s ladder) | https://developer.chrome.com/docs/lighthouse/overview/ |
+| 26–28 | the PageSpeed Insights API `measurement.md` calls, and its quota | https://developers.google.com/speed/docs/insights/v5/get-started?hl=en |
 
 The Core Web Vitals set is not permanent — FID was a Core metric until INP replaced it in March 2024.
 `standards.md` pins today's three; `web.dev/articles/vitals` is where a fourth change would appear first.

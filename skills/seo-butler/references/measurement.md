@@ -55,8 +55,26 @@ only (`cdn-layer.md`), so `/seo-live` against the real origin remains a separate
 
 ### Layer 2 — Lighthouse (Google's own auditor)
 
-**Primary: `lighthouse_audit` from the bundled chrome-devtools MCP.** Runs locally against a real
-Chrome — **no API key, no daily quota** — and works on localhost as well as a live URL:
+**Four rungs, in this order.** Go down one only when the rung above is unavailable or fails. Never
+start at the bottom.
+
+| Rung | How | What it costs |
+|---|---|---|
+| **1** | `lighthouse_audit` — the bundled chrome-devtools MCP | local, no key, no quota |
+| **2** | `scripts/lighthouse-local.mjs` — a browser already on this machine + the Lighthouse CLI | local, no key, no quota |
+| **3** | the PageSpeed Insights API | public URL only, **metered daily quota** |
+| **4** | nothing | record it in `measurements.unavailable`, with the reason |
+
+The order is not stylistic. Rungs 1 and 2 run on the machine the command is already running on and
+cost nothing. Rung 3 is metered by Google, and the keyless quota was exhausted across two commands
+in one day in the field. A run that opens at rung 3 spends the only scarce resource first and then
+has nothing to fall back to — which is exactly how `/seo-live` came back with HTTP 429 while a
+perfectly good Chrome sat idle on the same machine.
+
+#### Rung 1 — `lighthouse_audit` (chrome-devtools MCP)
+
+Runs locally against a real Chrome — **no API key, no daily quota** — and works on localhost as well
+as a live URL:
 ```
 lighthouse_audit(device: "mobile", mode: "navigation")
 ```
@@ -68,6 +86,73 @@ lighthouse_audit(device: "mobile", mode: "navigation")
 - **Agentic Browsing** is Lighthouse's newest category: how well an AI agent can navigate and
   understand the page. It is the closest thing to an *authoritative* GEO signal, and it comes from
   Google. Report it alongside the others; it is evidence, not a checklist item.
+
+Record the source as `local-lighthouse`.
+
+#### Rung 2 — a local browser + the Lighthouse CLI
+
+When chrome-devtools isn't connected, or `lighthouse_audit` errors, you have still almost certainly
+got a Chromium on the machine — Chrome, Edge, Brave, plain Chromium, or the one Playwright
+downloaded. Run Google's own Lighthouse against it:
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/lighthouse-local.mjs --url https://<site>/<path> \
+  --strategy mobile --out .seo-butler/lhr-home.json
+```
+
+It finds a browser, starts it headless on a throwaway profile, runs `npx -y lighthouse@12` against
+it, and prints a **compact score summary** to stdout. The full LHR goes to `--out`, not into the
+conversation — it is megabytes, and that file is exactly what `/seo-verify` feeds to
+`triage-external.mjs --lighthouse` (`ground-truth.md`).
+
+- The same categories as rung 1 **plus a real Performance score**, because the CLI runs the full
+  audit. What it does not give you is the insight breakdown of Layer 2b — that is a chrome-devtools
+  capability. You get the *what* without the *why*.
+- No API key, no quota, and it works against `localhost`.
+- **It never invents a score.** No browser found, the browser won't start, or Lighthouse returns a
+  `runtimeError` (the page didn't load, no First Contentful Paint) → it exits non-zero and prints
+  `{"ok": false, "reason": …}`. Copy that reason into `measurements.unavailable` verbatim and drop to
+  rung 3. A category Lighthouse scored as `null` is reported as unavailable, never as a 0.
+- `--find-browser` tells you what it would use and everywhere it looked. Run that first when you're
+  unsure whether this rung is even available on the user's machine.
+- If it reports *"Playwright is installed but its Chromium browser is not"*, the fix is one command:
+  `npx playwright install chromium`. **Tell the user; don't run it** — it's a ~150 MB download, and
+  installing browsers unasked is not this plugin's habit.
+- The first use fetches Lighthouse through `npx`, so it needs network once — the same mechanism
+  `.mcp.json` already uses for the bundled MCP servers. Offline with a cold npm cache, this rung is
+  unavailable; that is a reason to record, not a failure to hide.
+
+Record the source as `lighthouse-cli`.
+
+#### Rung 3 — PageSpeed Insights API (last resort)
+
+Only when there is a public URL and **both local rungs are unavailable** — no chrome-devtools MCP,
+and no browser the script can find:
+```
+https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<encoded-url>&strategy=mobile
+```
+It has one thing the local rungs don't: the same response carries CrUX field data (Layer 3). That is
+not a reason to call it first. On rungs 1 and 2 you get CrUX from the trace instead — spending a
+metered quota to fetch a number that is free elsewhere is how the quota runs out.
+
+The keyless quota is per-day and small — in the field it was exhausted across two commands in one
+day. A free key removes the limit (Google Cloud Console → enable *PageSpeed Insights API* → create a
+key), goes in the environment as `PAGESPEED_API_KEY`, appended as `&key=<key>`, and is **never
+written to `state.json`, printed, or committed.** Record the source as `psi`.
+
+#### Rung 4 — no number at all
+
+On quota or rate-limit failure — HTTP 429, or a 403/400 saying *"Quota exceeded … Queries per day"* —
+**produce no score.** Record the reason in `measurements.unavailable` and move on. Never estimate a
+Lighthouse number to fill the hole.
+
+**A 429 is only rung 4 if rungs 1 and 2 were actually tried.** If you have arrived here without
+having attempted `lighthouse_audit` and the local CLI, that is a bug in the run, not a fact about the
+site — go back and attempt them.
+
+**Which pages (all rungs):** the home page plus 2–3 pages that matter (a key landing page, a
+representative content page). Auditing every route is slow and adds little; say which pages you
+measured.
 
 ### Layer 2b — Performance, measured (not guessed)
 
@@ -85,21 +170,9 @@ context for no benefit. Read the summary, then use `performance_analyze_insight(
 a targeted question — *"which LCP phase was worst"*, *"which third parties cost the most"* — and
 report only the answer.
 
-### Layer 2c — PageSpeed Insights API (fallback)
-
-Only when there is a public URL but no local Chrome (so `lighthouse_audit` can't run):
-```
-https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=<encoded-url>&strategy=mobile
-```
-The keyless quota is per-day and small — in the field it was exhausted across two commands in one
-day. A free key removes the limit (Google Cloud Console → enable *PageSpeed Insights API* → create a
-key), goes in the environment as `PAGESPEED_API_KEY`, appended as `&key=<key>`, and is **never
-written to `state.json`, printed, or committed.** On quota or rate-limit failure — HTTP 429, or a
-403/400 saying *"Quota exceeded … Queries per day"* — **produce no score**, record the reason in
-`measurements.unavailable`, and move on. Never estimate a Lighthouse number to fill the hole.
-
-**Which pages:** the home page plus 2–3 pages that matter (a key landing page, a representative content
-page). Auditing every route is slow and adds little; say which pages you measured.
+**This is a rung-1 capability.** Rung 2 gives you a Performance score with LCP / CLS / TBT / FCP
+values but no insight breakdown; rung 3, the same. Say which one you had rather than reporting the
+thinner result as if it were this one.
 
 ### Layer 3 — Google's own view (opportunistic)
 Best evidence when available, but conditional — never block on it:
@@ -113,7 +186,7 @@ Best evidence when available, but conditional — never block on it:
 ### Layer 4 — Outside auditors (`ground-truth.md`, run by `/seo-verify`)
 Layers 1–3 all measure what *this* toolchain thinks to look at. Layer 4 asks tools with different
 blind spots: OpenSEO's site-wide crawl, geodaddy's GEO checks, and — importantly — **Lighthouse's
-SEO/accessibility/best-practices categories**, which Layers 2–2c compute and then use only for
+SEO/accessibility/best-practices categories**, which Layer 2 computes and then uses only for
 performance. Feed them all through `triage-external.mjs`, which maps every finding onto the fixed
 checklist and suppresses each tool's measured false positives.
 
@@ -147,10 +220,11 @@ Search Console:                 5 pages discovered · 1 indexed
 ```
 
 ## Persist
-Write a `measurements` block to `state.json` (see `state-schema.md`): when it ran, which source
-(`psi` / `local-lighthouse`), per-page scores, field metrics, and an explicit list of what could **not**
-be measured and why. **Before overwriting the latest snapshot, push the old one onto `measurements.history`**
-so movement over time is preserved (keep ~10, prune older).
+Write a `measurements` block to `state.json` (see `state-schema.md`): when it ran, **which rung
+produced the number** — `local-lighthouse` (rung 1), `lighthouse-cli` (rung 2) or `psi` (rung 3) —
+per-page scores, field metrics, and an explicit list of what could **not** be measured and why.
+**Before overwriting the latest snapshot, push the old one onto `measurements.history`** so movement
+over time is preserved (keep ~10, prune older).
 
 ## Show the trend (movement since last time)
 When a prior snapshot exists in `state.json`, report the **delta vs the last comparable measurement** —
@@ -160,8 +234,10 @@ Lighthouse (live, lab, mobile): Perf 78 (▲ +16 since 2026-07-15) · SEO 100 ·
 Real users (CrUX field):        LCP 2.1s (▼ from 2.8s) ✅ · INP 240ms ⚠️ · CLS 0.05 ✅
 ```
 Honesty guards, all inherited from below:
-- **Only compare like with like.** Never diff a lab score against a field score, or `psi` against
-  `local-lighthouse`. If the only prior snapshot isn't comparable, show the number with no delta and say why.
+- **Only compare like with like.** Never diff a lab score against a field score, and never diff two
+  different rungs — `local-lighthouse`, `lighthouse-cli` and `psi` are three separate harnesses, and
+  the gap between them is not a change in the site. If the only prior snapshot isn't comparable, show
+  the number with no delta and say why.
 - **Performance noise is not progress.** A few points of Lighthouse-performance movement between runs is
   noise — don't render it as ▲/▼. Only show a perf delta when it's large and repeatable, or a Core Web
   Vitals threshold was actually crossed.
@@ -171,4 +247,4 @@ Honesty guards, all inherited from below:
 - Never invent, estimate, or "approximate" a score. Missing is missing.
 - Say which tool produced each number and when.
 - If a whole layer was skipped (no network, no Chrome, rate-limited, site not public), state it in the
-  report — a silent omission reads as a pass.
+  report — **including which rung you ended on** — a silent omission reads as a pass.

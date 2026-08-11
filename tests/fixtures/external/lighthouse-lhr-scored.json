@@ -1,0 +1,24 @@
+{
+  "$fixture": "Trimmed LHR from a real `lighthouse-local.mjs --url https://example.com` run. All four categories scored, so --summarize has a complete result to shape. Scores are the CLI's 0-1 floats; the summary reports them as 0-100 integers.",
+  "lighthouseVersion": "12.8.2",
+  "fetchTime": "2026-08-10T16:43:16.930Z",
+  "requestedUrl": "https://example.com",
+  "finalDisplayedUrl": "https://example.com/",
+  "configSettings": {
+    "formFactor": "mobile"
+  },
+  "categories": {
+    "performance": { "id": "performance", "title": "Performance", "score": 1 },
+    "accessibility": { "id": "accessibility", "title": "Accessibility", "score": 1 },
+    "best-practices": { "id": "best-practices", "title": "Best Practices", "score": 0.96 },
+    "seo": { "id": "seo", "title": "SEO", "score": 0.8 }
+  },
+  "audits": {
+    "largest-contentful-paint": { "id": "largest-contentful-paint", "score": 1, "numericValue": 781.4285714285714 },
+    "cumulative-layout-shift": { "id": "cumulative-layout-shift", "score": 1, "numericValue": 0 },
+    "total-blocking-time": { "id": "total-blocking-time", "score": 1, "numericValue": 1.5 },
+    "first-contentful-paint": { "id": "first-contentful-paint", "score": 1, "numericValue": 755.2 },
+    "speed-index": { "id": "speed-index", "score": 1, "numericValue": 810.09 },
+    "meta-description": { "id": "meta-description", "title": "Document does not have a meta description", "score": 0, "scoreDisplayMode": "binary" }
+  }
+}

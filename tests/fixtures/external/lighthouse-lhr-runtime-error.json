@@ -1,0 +1,18 @@
+{
+  "$fixture": "The dangerous one. Lighthouse EXITS 0 on a page that never rendered and reports it in runtimeError with every category null. Read naively this is a successful run with no scores; read correctly it is not a measurement at all. --summarize must exit 1 on it.",
+  "lighthouseVersion": "12.8.2",
+  "fetchTime": "2026-08-10T16:55:41.002Z",
+  "requestedUrl": "https://example.com/broken",
+  "finalDisplayedUrl": "https://example.com/broken",
+  "runtimeError": {
+    "code": "NO_FCP",
+    "message": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)"
+  },
+  "categories": {
+    "performance": { "id": "performance", "title": "Performance", "score": null },
+    "accessibility": { "id": "accessibility", "title": "Accessibility", "score": null },
+    "best-practices": { "id": "best-practices", "title": "Best Practices", "score": null },
+    "seo": { "id": "seo", "title": "SEO", "score": null }
+  },
+  "audits": {}
+}

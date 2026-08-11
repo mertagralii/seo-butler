@@ -14,7 +14,7 @@ back a **plan** for the next `/seo` run. Reply in the user's language.
 ## Load your context
 
 Read **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/references/reporting.md`** and follow it end to end. You'll
-also want `measurement.md` (PSI/CrUX layer, trend rules) and `data-providers.md` (the OpenSEO Search
+also want `measurement.md` (the Lighthouse ladder and CrUX, trend rules) and `data-providers.md` (the OpenSEO Search
 Console connection, which is free and spends no credits).
 
 Read `./.seo-butler/state.json` first. It is the baseline **and** the changelog — which items were

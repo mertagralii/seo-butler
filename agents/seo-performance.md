@@ -38,9 +38,22 @@ Then read the code to **explain** the measurement, not to replace it: the trace 
 the code says *why* and *where to fix it*. Map insights onto your scope — `RenderBlocking` and
 `FontDisplay` → item 28, `LCPBreakdown` → item 26, `ThirdParties` → item 28 notes.
 
-**If you cannot measure** (site not deployed, no dev server, no browser), fall back to the code
-reading below — but **label every finding as inferred from source, not measured.** A guess presented
-as a measurement is the one thing this plugin will not do.
+**If chrome-devtools isn't available but the site is reachable**, you have not lost the measurement —
+you have lost the trace. Go to rung 2 of the ladder in `measurement.md` (Layer 2):
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/lighthouse-local.mjs --url <url> --strategy mobile
+```
+
+It runs Google's Lighthouse against a browser already on this machine and returns a real
+**Performance score** plus LCP / CLS / TBT / FCP. What it does not return is the insight breakdown —
+no `LCPBreakdown`, no `RenderBlocking` list — so you get the *what* without the *why*, and the code
+reading below has to do more of the work. Say which one you had. It exits non-zero rather than
+guessing when it can't find a browser or the page won't load.
+
+**If you cannot measure at all** (site not deployed, no dev server, no browser anywhere), fall back
+to the code reading below — but **label every finding as inferred from source, not measured.** A
+guess presented as a measurement is the one thing this plugin will not do.
 
 **Never dump the raw trace.** Each call returns a long call-tree and network-format specification
 alongside the data. Don't copy it into your reply or the report — read the summary, then use

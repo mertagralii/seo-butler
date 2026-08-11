@@ -71,7 +71,8 @@ first, too — items already `done` are settled and shouldn't be re-audited from
 - `references/ground-truth.md` — the `/seo-verify` convergence loop: check the deployed site against
   **Search Console, OpenSEO and geodaddy**, adjudicate what they report, close the real gaps, re-verify.
   Holds the source table and the **measured** false positives. Read it before believing any external tool.
-- `references/measurement.md` — real numbers from real tools: schema validation, Lighthouse (PSI or local),
+- `references/measurement.md` — real numbers from real tools: schema validation, Lighthouse down a
+  four-rung ladder (`lighthouse_audit` first, a local browser + CLI second, PSI only as a last resort),
   CrUX field data, Search Console. Independent verdicts instead of marking our own homework.
 - `references/monitoring.md` — the read-only `/seo-watch` watchdog: periodic regression checks against the
   stored baseline, with noise thresholds. It reports; it never changes anything.

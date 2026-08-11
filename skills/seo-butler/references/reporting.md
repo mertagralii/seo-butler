@@ -39,7 +39,7 @@ landed — too early to read. Check back around <date>."* Never manufacture a tr
    **Prefer the Performance page's CSV export button over scraping the UI**: the export is a stable
    contract, the SPA's DOM is not. Download, then read the file.
 3. **Neither available** → record it as skipped **with the reason** and report only what you *can*
-   measure (PSI/CrUX per `measurement.md`). "Couldn't check" is never "fine".
+   measure (Lighthouse and CrUX per `measurement.md`, down its ladder). "Couldn't check" is never "fine".
 
 GA4 is optional and secondary here. Search Console answers "what does Google think of us"; GA4 answers
 "what did visitors do once they arrived". Pull GA4 only if it's connected and the user asks about

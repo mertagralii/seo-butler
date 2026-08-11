@@ -100,7 +100,7 @@ drive GEO topic targeting, `Organization` schema, and the tone of any copy the b
   },
   "measurements": {
     "measuredAt": "2026-07-22",
-    "source": "psi",
+    "source": "local-lighthouse",
     "strategy": "mobile",
     "lighthouse": [
       { "url": "/",        "performance": 78, "seo": 100, "accessibility": 94, "bestPractices": 92 },
@@ -127,7 +127,7 @@ drive GEO topic targeting, `Organization` schema, and the tone of any copy the b
       { "what": "crux", "reason": "no field data yet — site is new / low traffic" }
     ],
     "history": [
-      { "measuredAt": "2026-07-15", "source": "local-lighthouse", "strategy": "mobile",
+      { "measuredAt": "2026-07-15", "source": "lighthouse-cli", "strategy": "mobile",
         "lighthouse": [ { "url": "/", "performance": 62, "seo": 91, "accessibility": 88, "bestPractices": 83 } ],
         "crux": null }
     ]
@@ -241,6 +241,14 @@ drive GEO topic targeting, `Organization` schema, and the tone of any copy the b
   most recent ~10 and prune older to avoid unbounded growth). This is what lets a run show *movement*
   (e.g. "LCP 2.8s → 2.1s since 2026-07-15") instead of re-measuring from zero. Only compare like with
   like — same page, same `source`/`strategy`; never diff a lab number against a field number.
+- **`source` names the rung that produced the numbers, and it is not decoration.** One of
+  `"local-lighthouse"` (rung 1, the chrome-devtools MCP), `"lighthouse-cli"` (rung 2,
+  `scripts/lighthouse-local.mjs` — a local browser plus the Lighthouse CLI), or `"psi"` (rung 3, the
+  PageSpeed Insights API). They are three different harnesses that disagree by a few points on the
+  same unchanged site, so a delta across two different sources is a harness change, not progress, and
+  `measurement.md`'s trend rules refuse to render it as one. `"local-lighthouse"` keeps its old
+  meaning on purpose: renaming it would make every history entry a user already has incomparable to
+  their next measurement, which is the one thing history is for.
 - On each run: read → treat `done`/`n/a` as settled → only re-open items whose scope changed
   (e.g. `pageCount` grew, new routes) or that are `partial`/`todo`.
 - After applying, update every touched item's `status`, `date`, `scope`, `notes`, and append to

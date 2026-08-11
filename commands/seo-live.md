@@ -12,7 +12,7 @@ generation emits non-canonical URLs, deploys land half-finished. None of that is
 
 ## Load your protocol
 Read **`${CLAUDE_PLUGIN_ROOT}/skills/seo-butler/references/live-verification.md`** and follow it end to
-end, plus **`measurement.md`** (real-tool scoring: Lighthouse/PSI, CrUX, schema validation). You'll also
+end, plus **`measurement.md`** (real-tool scoring: the Lighthouse ladder, CrUX, schema validation). You'll also
 want `cdn-layer.md` (edge overrides), `standards.md` (thresholds), `state-schema.md` (where to record
 results), and `scorecard.md` (how to report). The `seo-butler` skill has the full picture.
 
@@ -40,11 +40,18 @@ centralized in the orchestrator (see `safety.md`).
    verdicts instead of self-assessment:
    - **Always:** deterministic validation (parse every JSON-LD block and check schema.org required fields;
      sitemap XML; robots).
-   - **Lighthouse via the PageSpeed Insights API** — one call returns both the lab scores *and* CrUX field
-     data, no local browser needed. Mobile strategy first. Home page + 2–3 pages that matter.
-   - **Opportunistic:** CrUX real-user metrics (same response) and Search Console's own view via the
-     logged-in browser.
-   Anything you can't measure is reported as unavailable **with the reason** — never estimated.
+   - **Lighthouse — down the four-rung ladder in `measurement.md` Layer 2, in order, stopping at the
+     first that works:** `lighthouse_audit` (bundled chrome-devtools MCP) → `scripts/lighthouse-local.mjs`
+     (a browser already on this machine + the Lighthouse CLI) → the PageSpeed Insights API → no score,
+     recorded with the reason. **Do not open with PSI.** Its keyless quota is per-day and shared across
+     every command, so a run that starts there burns the one metered rung and has nothing left to fall
+     back to — that is how this command started returning 429 with a working Chrome on the same
+     machine. Mobile strategy first. Home page + 2–3 pages that matter.
+   - **Opportunistic:** CrUX real-user metrics and Search Console's own view via the logged-in browser.
+     CrUX rides along in a PSI response; on the local rungs, `performance_start_trace` reports it. No
+     field data on a new or low-traffic site is normal — report it as that, never as a bad score.
+   Anything you can't measure is reported as unavailable **with the reason** — never estimated, and
+   naming the rung you got to.
 
 4. **Report findings in two buckets**, because they're fixed in different places:
    - **Code-side** → offer the normal butler flow: plan → approval → apply. When done, tell the user:
@@ -72,6 +79,7 @@ centralized in the orchestrator (see `safety.md`).
 ## Rules
 - Reply in the user's language.
 - **The loop stays open until live is clean.** Don't declare success with findings outstanding.
-- If the site is unreachable, or chrome-devtools isn't available, say exactly what you could and couldn't
-  check. Never infer a pass.
+- If the site is unreachable, say exactly what you could and couldn't check. Never infer a pass.
+- **chrome-devtools being unavailable is not a reason to skip Lighthouse** — it's a reason to go to
+  rung 2. Only report a Lighthouse score as unmeasurable once the local rungs have actually been tried.
 - Nothing in the repo is evidence here. Only what you fetched counts.

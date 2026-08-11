@@ -29,7 +29,18 @@ live), and `measurements` (the last real numbers). Without a baseline there's no
   required, JSON-LD present as literal `application/ld+json` and still parsing, analytics tag present.
 
 **2. Real measurement drift** (`measurement.md`)
-Re-run Lighthouse via PSI and read CrUX, then **diff against the stored measurements**.
+Re-run Lighthouse down the Layer 2 ladder — `lighthouse_audit` (chrome-devtools MCP) first,
+`scripts/lighthouse-local.mjs` (a local browser plus the Lighthouse CLI) second, the PageSpeed
+Insights API only when neither is available — then read CrUX and **diff against the stored
+measurements**.
+
+The ordering matters more here than anywhere else in the plugin:
+- **Nobody is watching.** PSI's keyless quota is per-day and shared with every other command. A
+  scheduled watch that opens there gets a 429, records "no measurement", and the noise thresholds
+  below have nothing to fire on — week after week, silently.
+- **`measurements.source` says which rung produced the number** (`local-lighthouse` / `lighthouse-cli`
+  / `psi`). Diff only like with like: a rung change is a harness change, and filing it as a regression
+  is exactly the false alarm this section exists to prevent. Report the value with no delta and say why.
 
 **3. New, untreated pages**
 If the site has routes that aren't in `state.json`, flag them: someone shipped pages that never went

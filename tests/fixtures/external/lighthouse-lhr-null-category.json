@@ -1,0 +1,18 @@
+{
+  "$fixture": "An LHR where Lighthouse produced no performance score - it happens when the run is throttled out or the category errors. A null score is NOT a zero, and the summary must report it as unavailable rather than inventing a 0 that reads as 'this page is catastrophically slow'.",
+  "lighthouseVersion": "12.8.2",
+  "fetchTime": "2026-08-10T16:51:02.114Z",
+  "finalDisplayedUrl": "https://example.com/pricing",
+  "configSettings": {
+    "formFactor": "desktop"
+  },
+  "categories": {
+    "performance": { "id": "performance", "title": "Performance", "score": null },
+    "accessibility": { "id": "accessibility", "title": "Accessibility", "score": 0.94 },
+    "best-practices": { "id": "best-practices", "title": "Best Practices", "score": 0.92 },
+    "seo": { "id": "seo", "title": "SEO", "score": 1 }
+  },
+  "audits": {
+    "cumulative-layout-shift": { "id": "cumulative-layout-shift", "score": 1, "numericValue": 0.041 }
+  }
+}

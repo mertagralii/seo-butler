@@ -35,8 +35,12 @@ means), and `state-schema.md` (the baseline and where history goes).
    200; and on key pages the rendered output still carries canonical, the right `<meta name="robots">`,
    parseable `application/ld+json`, and the analytics tag.
 
-3. **Re-measure and diff** — Lighthouse via PSI plus CrUX (`measurement.md`), compared against the stored
-   measurements.
+3. **Re-measure and diff** — Lighthouse down the same ladder `/seo-live` uses (`measurement.md`
+   Layer 2: `lighthouse_audit` → `scripts/lighthouse-local.mjs` → PSI → recorded as unmeasured), plus
+   CrUX, compared against the stored measurements. Two things bite here specifically: an unattended
+   run has **nobody to notice a 429**, so opening at PSI turns into a silently empty week; and a
+   number from a different rung than the baseline is a different harness, not a regression — show it
+   with no delta and say why.
 
 4. **Spot untreated pages** — routes that exist now but aren't in `state.json` were shipped without the
    butler and probably have no metadata.

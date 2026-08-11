@@ -42,7 +42,7 @@ Four different questions, four answers. Blending them produces a number that mea
 |---|---|---|
 | **Coverage** | "Did the butler do the work?" | the weighted checklist above |
 | **Live verified** | "Is it actually deployed and intact?" | `/seo-live` (`live-verification.md`) |
-| **Lighthouse (lab)** | "Is the page technically good?" | Google's auditor, run locally (`measurement.md`) |
+| **Lighthouse (lab)** | "Is the page technically good?" | Google's auditor, run locally where possible — rung 1 or 2 of `measurement.md`'s ladder |
 | **Performance (measured)** | "Is it actually fast?" | A real load trace — separate from Lighthouse (`measurement.md`) |
 | **Real users (CrUX field)** | "What do real visitors experience?" | Chrome UX Report — needs live traffic |
 | **Search Console** | "What does Google actually think?" | the user's verified property |
@@ -57,9 +57,12 @@ Real users (CrUX field):        LCP 2.1s (▼ from 2.8s) ✅ · INP 240ms ⚠️
 Search Console:                 5 pages discovered · 1 indexed
 ```
 
-**Lighthouse and performance are separate lines on purpose.** `lighthouse_audit` does not return a
+**Lighthouse and performance are separate lines on purpose.** At rung 1 `lighthouse_audit` returns no
 performance score — that comes from the load trace. Merging them into one "Lighthouse: 95" would be
-exactly the blended number this section exists to prevent.
+exactly the blended number this section exists to prevent. The CLI at rung 2 *does* return a
+performance score, and it is a lab score too: put it on the Lighthouse line, label the source, and
+leave the "Performance (lab trace)" line saying what it actually is — unavailable, because the trace
+is a rung-1 capability.
 
 **Agentic Browsing** is Lighthouse's newest category: how well an AI agent can navigate and understand
 the page. It's the closest thing to an *authoritative* GEO signal, and it comes from Google — so

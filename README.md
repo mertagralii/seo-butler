@@ -220,7 +220,8 @@ atlanmış başlık seviyesi vardı. Dışarıdan bir crawler hepsini tek turda 
 - **geodaddy** — GEO tarafı: AI botlarının erişimi, schema stacking, semantik HTML, Core Web Vitals.
   Tamamen ücretsiz, hesap ve API key istemiyor. Pakette geliyor.
 - **Lighthouse** — Google'ın kendi denetimi; chrome-devtools MCP'siyle **yerelde** çalışıyor, kota ve
-  anahtar yok. Zaten performans katmanıydı; artık SEO/erişilebilirlik bulguları da triage'a giriyor.
+  anahtar yok — o MCP bağlı değilse aynı denetim, makinede zaten olan bir tarayıcıya karşı Lighthouse
+  CLI ile koşuyor. Zaten performans katmanıydı; artık SEO/erişilebilirlik bulguları da triage'a giriyor.
 
 Neden dört kaynak? Çünkü her biri **başka bir yerde kör**. Aynı sitede aynı oturumda ölçüldü:
 **Lighthouse SEO'ya 100/100 verdi**, o sırada OpenSEO üç sayfada 404 veren link, geodaddy atlanmış
@@ -316,7 +317,8 @@ bir yanlış okuma senin siteni değiştirmesin diye.
 | **context7 MCP** | Opsiyonel | Framework'e özgü API'ları doğrulamak için. Pakette geliyor. |
 | **geodaddy MCP** | Önerilir | `/seo-verify`'ın GEO denetçisi: AI bot erişimi, schema stacking, semantik HTML, Core Web Vitals. **Tamamen ücretsiz — hesap yok, API key yok.** Pakette geliyor. |
 | **OpenSEO MCP** | Önerilir | İki iş birden: `/seo-verify`'ın site geneli crawl'ı + Search Console erişimi (**okuma ücretsiz, kredi harcamaz**), ve opsiyonel gerçek arama hacmi/zorluk verisi (~$10/ay). **Yoksa strateji anahtarsız çalışır** — nitel sinyaller, uydurma hacim yok. |
-| **PSI API anahtarı** | Nadiren gerekir | Yalnızca yerel Chrome yokken devreye giren yedek. Lighthouse artık yerelde çalıştığı için çoğu kullanıcı buna hiç ihtiyaç duymaz. |
+| **Yerel bir Chrome/Edge/Chromium** | Önerilir | chrome-devtools MCP bağlı değilken devreye giren yedek: `scripts/lighthouse-local.mjs` makinede zaten olan Chromium'u başlatıp Lighthouse CLI'yi ona karşı çalıştırır. Windows'ta Edge sayılır. Kurulacak bir şey yok. |
+| **PSI API anahtarı** | Neredeyse hiç gerekmez | Dört basamaklı merdivenin üçüncüsü; üstündeki iki basamak da yerelde, kotasız çalıştığı için ancak makinede hiç tarayıcı yoksa buraya inilir. |
 
 Hafızası `./.seo-butler/state.json` içinde tutulur — `.gitignore`'a eklemeni önerir (iş profili
 içerir), ama karar senin.
@@ -341,6 +343,26 @@ bir link, beş sayfada ölü bir iletişim linki, `done` işaretli bir maddede a
 Kök neden yapısaldı — kağıt üzerinde var olan ama arkasında mekanik kontrol olmayan madde, sessizce
 "model kaynağa bakar" seviyesine düşüyordu. v2.1.1 o kontrolleri yazdı, v2.2.0 ise
 `/seo-verify` ile dış denetimi kalıcı hale getirdi. Bu README'deki bütün bulgular ölçüm, iddia değil.
+
+**v2.4.0 canlı bir koşuda yakalanan bir yönlendirme hatasını düzeltiyor.** `/seo-live` Lighthouse'u
+PageSpeed Insights API üzerinden ölçüyor, anahtarsız günlük kotayı doldurup **HTTP 429** ile
+dönüyordu — aynı makinede bunu bedavaya cevaplayabilecek bir Chrome boşta dururken. Komut dosyaları
+PSI'yı birincil yol olarak adlandırıyordu; `measurement.md` ise onu baştan beri üçüncü sıraya
+koymuştu. Altı dosya karar veren dosyayla çelişiyordu ve hiçbir şey kontrol etmiyordu. Merdiven artık
+tek yerde yazılı — `lighthouse_audit` (chrome-devtools MCP) → makinedeki bir tarayıcı + Lighthouse CLI
+→ PSI → sebebiyle birlikte "ölçülemedi" — ve bir test, PSI'yı yerel basamaklardan önce adlandıran
+dosyada build'i düşürüyor.
+
+Aradaki yeni basamak `scripts/lighthouse-local.mjs`. **Bu, Playwright'ın geri dönüşü değil.** v2.1.0
+kararı yerinde duruyor: `playwright` MCP sunucusu yok, npm bağımlılığı yok, kurulacak bir şey yok.
+Script yalnızca **zaten orada olan** bir Chromium arıyor — Chrome, Edge, Brave, düz Chromium ya da
+Playwright kuruluysa onun indirdiği — tek kullanımlık bir profille headless başlatıyor ve Google'ın
+Lighthouse CLI'sini `npx` üzerinden ona karşı çalıştırıyor. Tarayıcı bulamazsa nereye baktığını yazıp
+sıfırdan farklı bir kodla çıkıyor. Ölçmediği bir sayıyı asla üretmiyor.
+
+Bu Windows makinesinde uçtan uca doğrulandı: keşif Chrome'u buldu, gerçek bir denetim gerçek skorlar
+döndürdü, çıktı `triage-external.mjs`'e sorunsuz aktı. **Ama rung 2 henüz tam bir `/seo-live`
+koşusunu taşımadı** — 429'un kendisi düzeldi, komutun tamamı bu yolla baştan sona çalışmadı.
 
 **v2.3.0'daki yenilik henüz tam bir koşuda denenmedi** — kanonik kaynak kaydı. 35 URL'in tamamı
 çekilip çözüldüğü ve kayıtlı olduğu bilgiyi gerçekten taşıdığı doğrulandı, dikişler testle korunuyor;
@@ -575,8 +597,9 @@ it in one pass.
 - **geodaddy** — the GEO side: AI-bot access, schema stacking, semantic HTML, Core Web Vitals.
   Completely free, no account, no API key. Bundled.
 - **Lighthouse** — Google's own audit, run **locally** through the chrome-devtools MCP, so no quota
-  and no key. It was already the performance layer; now its SEO and accessibility findings are
-  triaged too.
+  and no key — and if that MCP isn't connected, the same audit runs through the Lighthouse CLI against
+  a browser already on your machine. It was already the performance layer; now its SEO and
+  accessibility findings are triaged too.
 
 Why four sources? Because each is blind somewhere different. Measured on one site in one session:
 **Lighthouse scored SEO 100/100** while OpenSEO found a 404-ing internal link on three pages and
@@ -675,7 +698,8 @@ the source URL. One misread page should never rewrite your site.
 | **context7 MCP** | Optional | Confirms framework-specific APIs. Bundled. |
 | **geodaddy MCP** | Recommended | `/seo-verify`'s GEO auditor: AI-bot access, schema stacking, semantic HTML, Core Web Vitals. **Completely free — no account, no API key.** Bundled. |
 | **OpenSEO MCP** | Recommended | Two jobs: `/seo-verify`'s site-wide crawl + Search Console access (**reading is free, spends no credits**), and the optional real volume/difficulty layer (~$10/mo). **Without it strategy runs keyless** — qualitative signals, no invented volumes. |
-| **A PSI API key** | Rarely needed | Only the fallback for when there's no local Chrome. Lighthouse runs locally now, so most people never need it. |
+| **A local Chrome/Edge/Chromium** | Recommended | The fallback for when the chrome-devtools MCP isn't connected: `scripts/lighthouse-local.mjs` starts whatever Chromium is already on the machine and runs the Lighthouse CLI against it. On Windows, Edge counts. Nothing to install. |
+| **A PSI API key** | Almost never needed | The third of four rungs, reached only when there's no local browser at all. The two rungs above it run locally with no quota. |
 
 Its memory lives in `./.seo-butler/state.json` — it suggests adding that to `.gitignore` (it holds a
 business profile), but the call is yours.
@@ -702,6 +726,26 @@ marked `done`. The root cause was structural — an item that existed on paper b
 check behind it quietly degraded to "the model will look at the source". v2.1.1 wrote those checks;
 v2.2.0 made outside auditing permanent with `/seo-verify`. Every finding in this README is a
 measurement, not a claim.
+
+**v2.4.0 fixes a routing bug caught in a live run.** `/seo-live` measured Lighthouse through the
+PageSpeed Insights API, hit the keyless daily quota, and came back with **HTTP 429** — while a Chrome
+that could have answered for free sat idle on the same machine. The command files named PSI as the
+primary path; `measurement.md` had always ranked it third. Six files disagreed with the one that owns
+the decision, and nothing was checking. The ladder is now written once and pointed at from everywhere
+else — `lighthouse_audit` (chrome-devtools MCP) → a local browser plus the Lighthouse CLI → PSI →
+recorded as unmeasured, with the reason — and a test fails the build if any of those files names PSI
+before the local rungs.
+
+The new middle rung is `scripts/lighthouse-local.mjs`. **This is not Playwright coming back.** The
+v2.1.0 removal stands: there's no `playwright` MCP server, no npm dependency, and nothing to install.
+The script looks for a Chromium that's already there — Chrome, Edge, Brave, plain Chromium, or the one
+Playwright downloaded if you happen to have Playwright — starts it headless on a throwaway profile,
+and runs Google's Lighthouse CLI against it through `npx`. If it can't find a browser it says where it
+looked and exits non-zero. It never produces a number it didn't measure.
+
+It was verified end to end on a Windows machine: discovery found Chrome, a real audit returned real
+scores, and the output fed `triage-external.mjs` cleanly. **But rung 2 has not yet carried a full
+`/seo-live` run** — the 429 itself is fixed; the whole command has not been driven through this path.
 
 **What's new in v2.3.0 hasn't been through a full run yet** — the canonical source registry. All 35 of
 its URLs were fetched and confirmed to resolve and carry the fact they're registered for, and the
