@@ -67,7 +67,12 @@ in the files, all broken in the output. The lesson: **the file is not the output
 
 So for any server-rendered or templated stack (and whenever a local run is possible):
 
-1. Start the app on a local port.
+1. Start the app on a local port **other than the project's default** (the one in its dev script or
+   env example). A site URL that silently falls back to `http://localhost:<default>` is invisible when
+   the app is served on that same port; on any other port the validator reports the mismatch on the
+   canonical, the sitemap and the robots `Sitemap:` line. Build with the production site URL when the
+   project has one; with no domain yet, build with the local origin and say the canonical host is
+   still unsettled.
 2. **Point the validator at it.** `--url` takes any origin — a localhost one works exactly like a
    deployed one, so this is the same machine-checked verdict `/seo-live` produces, just earlier:
 
@@ -80,10 +85,13 @@ So for any server-rendered or templated stack (and whenever a local run is possi
    judgement call you would have to make correctly on every page, and the script makes it the same
    way every time. It settles: the literal `application/ld+json` type (and each block parsed, with
    the real `@type` inventory), sitemap XML + BOM **on the bytes**, robots.txt and the AI-bot groups,
-   canonical presence/uniqueness/absoluteness, `<meta name="robots">`, title and description budgets,
-   Open Graph and Twitter tags, `<html lang>`, mixed content, heading order and `<h1>` count, and
-   **link integrity** — the crawl follows links outward, so it reaches the `noindex` auth pages that
-   are absent from the sitemap and accumulate the broken links.
+   canonical presence/uniqueness/absoluteness, whether the canonical, the sitemap `<loc>`s and the
+   robots `Sitemap:` line point at the origin being audited, `<meta name="robots">`, indexable pages
+   too thin to be anything but placeholders, title and description budgets, Open Graph and Twitter
+   tags (and `og:url` matching the canonical), `<html lang>`, mixed content, heading order and `<h1>`
+   count, and **link integrity** — the crawl follows links outward, so it reaches the `noindex` auth
+   pages that are absent from the sitemap and accumulate the broken links, and it checks that every
+   `#section` link has its id in the served HTML.
 
 3. Verify by hand only what the script deliberately leaves to judgement:
    - whether duplicate routes really return **301** (not 200) — the script cannot know which routes
