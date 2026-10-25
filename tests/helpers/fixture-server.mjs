@@ -58,7 +58,12 @@ export function goodPage ({
   jsonLd = null,
   links = [],
   extraHead = '',
-  robotsMeta = null
+  robotsMeta = null,
+  ogUrl = canonical,
+  body = 'Example Co builds a small, sensible product for people who want to get one job done without fuss. ' +
+    'This paragraph exists so the page carries a realistic amount of text: enough words that a check for ' +
+    'thin, placeholder pages has nothing to say about it, and short enough that the fixture stays readable ' +
+    'when a test fails and somebody has to look at the HTML it produced.'
 } = {}) {
   const graph = jsonLd ?? JSON.stringify({
     '@context': 'https://schema.org',
@@ -79,7 +84,7 @@ ${robotsMeta ? `<meta name="robots" content="${robotsMeta}">` : ''}
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:image" content="https://example.com/og.png">
-<meta property="og:url" content="${canonical}">
+<meta property="og:url" content="${ogUrl}">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 ${extraHead}
@@ -87,6 +92,7 @@ ${extraHead}
 </head>
 <body>
 ${headings.map((h, i) => `<${h}>Heading ${i + 1}</${h}>`).join('\n')}
+<p>${body}</p>
 ${links.map(href => `<a href="${href}">go to ${href}</a>`).join('\n')}
 </body>
 </html>`
