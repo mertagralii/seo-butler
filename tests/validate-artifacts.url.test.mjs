@@ -274,6 +274,29 @@ describe('validate-artifacts.mjs --url', () => {
       assert.match(noindex.detail, /If this page is meant to rank/)
     })
 
+    test('an inner noindex page that the sitemap also leaves out reads as deliberate, not as a failure', async () => {
+      const { result } = await auditSite({
+        '/sitemap.xml': { body: sitemap(['/'], { base: '' }) },
+        '/kvkk': { body: goodPage({ robotsMeta: 'noindex, follow', description: 'Taslak metin.' }) }
+      }, { args: ['--no-links'], pages: '/,/kvkk' })
+
+      const noindex = check(result, 'page[/kvkk].noindex')
+      assert.equal(noindex.status, 'info')
+      assert.match(noindex.detail, /the two agree/)
+      assert.equal(check(result, 'page[/kvkk].description').status, 'info')
+    })
+
+    test('a noindex page that the sitemap lists fails as a contradiction', async () => {
+      const { result } = await auditSite({
+        '/sitemap.xml': { body: sitemap(['/', '/kvkk'], { base: '' }) },
+        '/kvkk': { body: goodPage({ robotsMeta: 'noindex' }) }
+      }, { args: ['--no-links'], pages: '/,/kvkk' })
+
+      const noindex = check(result, 'page[/kvkk].noindex')
+      assert.equal(noindex.status, 'fail')
+      assert.match(noindex.detail, /also listed in sitemap\.xml/)
+    })
+
     test('a page that does not respond is reported as unreachable, not as clean', async () => {
       const { result } = await auditSite(
         { '/sitemap.xml': { body: sitemap(['/']) } },

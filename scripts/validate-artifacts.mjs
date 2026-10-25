@@ -805,7 +805,7 @@ async function checkLinks (add, origin, seeds, { maxLinks, linkDepth }) {
     'page the crawl descended through will not be reported.')
 }
 
-function checkPage (add, page, res, origin = null) {
+function checkPage (add, page, res, origin = null, sitemapUrls = null) {
   if (!res.ok) {
     add(`page[${page}].reachable`, 'broken_links', 13, 'fail',
       `HTTP ${res.status}${res.error ? ` - ${res.error}` : ''}`)
@@ -827,9 +827,15 @@ function checkPage (add, page, res, origin = null) {
     add(`page[${page}].title`, 'titles', 3, 'pass', `<title> ${title.length} chars.`)
   }
 
+  const robotsMeta = metaByName(html, 'robots')
+  const noindex = !!robotsMeta && /noindex/i.test(robotsMeta)
+
   // meta description
   const desc = metaByName(html, 'description')
-  if (!desc) {
+  if (noindex && desc) {
+    add(`page[${page}].description`, 'meta_description', 4, 'info',
+      `Meta description ${desc.length} chars. Not judged: the page is noindex, so search never shows it.`)
+  } else if (!desc) {
     add(`page[${page}].description`, 'meta_description', 4, 'fail', 'No meta description.')
   } else if (desc.length > DESC_MAX) {
     add(`page[${page}].description`, 'meta_description', 4, 'warn',
@@ -862,11 +868,16 @@ function checkPage (add, page, res, origin = null) {
   }
 
   // meta robots / noindex hygiene
-  const robotsMeta = metaByName(html, 'robots')
-  if (robotsMeta && /noindex/i.test(robotsMeta)) {
+  const listed = sitemapUrls && res.url ? [...sitemapUrls].some(u => sameUrl(u, res.url)) : null
+  if (noindex && page !== '/' && listed === false) {
+    add(`page[${page}].noindex`, 'robots_hygiene', 11, 'info',
+      `Page declares <meta name="robots" content="${robotsMeta}"> and is left out of sitemap.xml - the two ` +
+      'agree, so the exclusion looks deliberate. Only a defect if this page is meant to rank.')
+  } else if (noindex) {
     add(`page[${page}].noindex`, 'robots_hygiene', 11, 'fail',
       `Page declares <meta name="robots" content="${robotsMeta}">. If this page is meant to rank, ` +
-      'that single tag removes it from search.')
+      'that single tag removes it from search.' +
+      (listed ? ' It is also listed in sitemap.xml, which asks search engines to index it: one of the two is wrong.' : ''))
   } else {
     add(`page[${page}].noindex`, 'robots_hygiene', 11, 'pass',
       robotsMeta ? `meta robots: ${robotsMeta}` : 'No meta robots restriction.')
@@ -1050,18 +1061,22 @@ async function run (args) {
     add('llms.live', 'llms_txt', 22, live.llms.ok ? 'pass' : 'warn',
       live.llms.ok ? 'llms.txt served.' : `No llms.txt (HTTP ${live.llms.status}).`)
 
+    const sitemapLocs = live.sitemap?.ok
+      ? [...stripBom(live.sitemap.text).matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map(m => m[1])
+      : []
+    const sitemapUrls = live.sitemap?.ok
+      ? new Set(sitemapLocs.map(l => absolutize(l, origin)).filter(Boolean))
+      : null
+
     for (const page of args.pages) {
       const path = page.startsWith('/') ? page : `/${page}`
-      checkPage(add, path, await fetchRaw(`${origin}${path}`), origin)
+      checkPage(add, path, await fetchRaw(`${origin}${path}`), origin, sitemapUrls)
     }
 
     if (args.links) {
       // Seed from the requested pages AND the sitemap. The sitemap alone is not enough (noindex pages
       // are deliberately absent from it), and the requested pages alone are not enough (they are
       // usually just "/"), so the union is what gives the crawl somewhere real to start.
-      const sitemapLocs = live.sitemap?.ok
-        ? [...stripBom(live.sitemap.text).matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map(m => m[1])
-        : []
       const seeds = [
         ...args.pages.map(p => `${origin}${p.startsWith('/') ? p : `/${p}`}`),
         ...sitemapLocs
