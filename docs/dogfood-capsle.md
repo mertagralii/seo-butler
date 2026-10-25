@@ -28,3 +28,23 @@ shared base, noindex the placeholder legal pages and take them out of the sitema
 skip on `/iletisim`. P2: fail the build when the site URL is unset, keep above-the-fold elements out
 of the new reveal/parallax start states (lab LCP is 3.46 s, element = the hero wordmark, 87% render
 delay), 24 px touch targets for the carousel dots.
+
+## Round 2 (site at commit 6f5137c)
+
+Capsle.Web fixed every round-1 item. Validator result: `77 passed · 0 failed · 2 warnings`. The two
+warnings are deliberate: no `<lastmod>` (no real content dates) and no `llms.txt`. Home JSON-LD is
+`FAQPage, Organization, WebSite` with the 6 visible Q&As. Every route has a full set of Open Graph
+tags plus `twitter:image`, with `og:url` equal to the canonical. Lighthouse 13 (mobile): perf 90,
+a11y 100, best practices 100, SEO 100.
+
+| # | Problem | How found | Fix |
+|---|---|---|---|
+| 8 | **Deliberate noindex counted as a failure.** The 4 placeholder pages were noindexed *and* left out of the sitemap, exactly as recommended, but each one still FAILed. Their short meta descriptions also warned, although search never shows a description for a noindex page. Triage already suppressed both for external tools; the validator didn't. | Re-audit came back `4 failed`, all `noindex`. | Inner noindex page absent from the sitemap → `info` ("the two agree"). Listed in the sitemap → `fail`, naming the contradiction. `/` → still `fail`. Description budgets aren't judged on noindex pages. |
+| 9 | **The pinned `lighthouse@12` returned no performance score.** On Chrome 155 it reported `NO_LCP` for this page and the performance category came back empty; `lighthouse@13` measured the same page (3.6 s). The summary only said "no performance score" and gave no reason. | `lighthouse-local.mjs` run on the new build; then LH 12 and 13 run directly, side by side. | Pin bumped to `lighthouse@13` (LH13 reports parse with `--summarize` and triage maps all of their findings). A metric that errors now goes into `unavailable` with its own error message. |
+
+LCP diagnosis sent back: simulated LCP is ~3.45 s even with `prefers-reduced-motion` forced
+(unthrottled LCP equals FCP, 65 ms). So the simulated number comes from the page's resource weight
+under simulated slow 4G (render-blocking CSS, JS, ~213 KB of preloaded fonts), not from the motion.
+`font-display` passes. The intro animation moves the unthrottled LCP from 65 ms to ~717 ms. That is
+the motion's real cost, and it is still well under 2.5 s. `latin-ext` must stay: Turkish ğ, ş, ı and
+İ are in it.
