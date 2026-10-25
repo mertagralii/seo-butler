@@ -114,7 +114,18 @@
     "uses-responsive-images":    { "item": 27, "verdict": "act" },
     "modern-image-formats":      { "item": 27, "verdict": "act" },
     "unsized-images":            { "item": 27, "verdict": "act" },
-    "render-blocking-resources": { "item": 28, "verdict": "act" }
+    "render-blocking-resources": { "item": 28, "verdict": "act" },
+    "render-blocking-insight":   { "item": 28, "verdict": "act",           "note": "Lighthouse 12's insight form of render-blocking-resources; the same job." },
+    "largest-contentful-paint-element": { "item": 26, "verdict": "act",    "note": "Names the LCP element and how its time splits into TTFB, load and render delay. A large render delay on a text element points at fonts, CSS or script-driven entrance animations, not at the network." },
+    "lcp-breakdown-insight":     { "item": 26, "verdict": "act",           "note": "Lighthouse 12's insight form of the LCP element breakdown; the same job." },
+    "network-dependency-tree-insight": { "item": 28, "verdict": "verify",  "note": "Critical request chains. In framework builds most of the chain is the framework's own chunks; act only on what the project added." },
+    "unused-javascript":         { "item": 28, "verdict": "verify",        "note": "Usually the framework runtime or a shared chunk. Bundle splitting is report, don't force (standards.md)." },
+    "legacy-javascript":         { "item": 28, "verdict": "verify",        "note": "Polyfills from the build target (browserslist). A build-config change: report it, don't force it." },
+    "legacy-javascript-insight": { "item": 28, "verdict": "verify",        "note": "Lighthouse 12's insight form of legacy-javascript; the same job." },
+    "dom-size":                  { "item": 26, "verdict": "verify",        "note": "A large DOM slows style and layout, which shows up in INP. Long single-page landings with decorative markup hit it easily; judge against the measured INP/TBT, not the element count." },
+    "dom-size-insight":          { "item": 26, "verdict": "verify",        "note": "Lighthouse 12's insight form of dom-size; the same job." },
+    "interactive":               { "item": 26, "verdict": "verify",        "note": "Time to Interactive is not a Core Web Vital and has not counted toward the performance score since Lighthouse 10. INP (lab stand-in: TBT) is what counts." },
+    "max-potential-fid":         { "item": 26, "verdict": "verify",        "note": "FID was retired as a Core Web Vital in March 2024 in favour of INP. Read TBT instead." }
   },
 
   "urlPatterns": [
