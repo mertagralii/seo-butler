@@ -96,11 +96,11 @@ node scripts/triage-external.mjs --openseo issues.json --geodaddy gd.json --ligh
 
 ## Known limitations
 
-Current version **v2.4.0**. All four commands have been run end to end on a real project (ASP.NET Core MVC, live site) and held their honesty gates. Still untested:
+Current version **v2.5.0**. All four commands have been run end to end on a real project (ASP.NET Core MVC, live site) and held their honesty gates. v2.5.0 adds a second project, run before it had a domain: a Turkish Next.js 16 site, audited locally over two rounds with `validate-artifacts.mjs --url` and `lighthouse-local.mjs` (`docs/dogfood-capsle.md`). Still untested:
 
-- A first run on a fresh project has never been exercised.
+- A full first `/seo` run on a fresh project, through plan, apply and state — the Next.js run exercised the audit and the scripts, not the apply step.
 - The v2.3.0 source registry resolves and is covered by tests, but no live run has yet watched a specialist read a source and act on it.
-- The local-Lighthouse rung was verified standalone on Windows, but hasn't carried a full `/seo-live` run.
+- The local-Lighthouse rung (now Lighthouse 13) was verified standalone on Windows and macOS, but hasn't carried a full `/seo-live` run.
 
 This section is here because the plugin holds itself to the same rule it holds your site to.
 

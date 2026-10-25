@@ -96,11 +96,11 @@ node scripts/triage-external.mjs --openseo issues.json --geodaddy gd.json --ligh
 
 ## Bilinen eksikler
 
-Güncel sürüm **v2.4.0**. Dört komut da gerçek bir projede (ASP.NET Core MVC, canlı site) uçtan uca çalıştırıldı ve dürüstlük kapılarını geçti. Hâlâ test edilmemiş olanlar:
+Güncel sürüm **v2.5.0**. Dört komut da gerçek bir projede (ASP.NET Core MVC, canlı site) uçtan uca çalıştırıldı ve dürüstlük kapılarını geçti. v2.5.0 ikinci bir proje ekliyor, henüz alan adı yokken: Türkçe bir Next.js 16 sitesi, `validate-artifacts.mjs --url` ve `lighthouse-local.mjs` ile yerelde iki turda denetlendi (`docs/dogfood-capsle.md`). Hâlâ test edilmemiş olanlar:
 
-- Sıfırdan bir projede ilk koşu hiç denenmedi.
+- Sıfırdan bir projede plan, uygulama ve state dahil tam bir ilk `/seo` koşusu — Next.js koşusu denetimi ve script'leri çalıştırdı, uygulama adımını değil.
 - v2.3.0 kaynak kaydının 35 URL'i çözülüyor ve testlerle korunuyor, ama canlı bir koşuda bir uzmanın kaynağı okuyup ona göre iş yapması henüz izlenmedi.
-- Yerel Lighthouse basamağı Windows'ta tek başına doğrulandı, ama tam bir `/seo-live` koşusu bu yoldan geçmedi.
+- Yerel Lighthouse basamağı (artık Lighthouse 13) Windows'ta ve macOS'ta tek başına doğrulandı, ama tam bir `/seo-live` koşusu bu yoldan geçmedi.
 
 Bu bölüm burada, çünkü plugin senin siteni tuttuğu kuralın aynısına kendini de tutuyor.
 
