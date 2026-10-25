@@ -48,3 +48,15 @@ under simulated slow 4G (render-blocking CSS, JS, ~213 KB of preloaded fonts), n
 `font-display` passes. The intro animation moves the unthrottled LCP from 65 ms to ~717 ms. That is
 the motion's real cost, and it is still well under 2.5 s. `latin-ext` must stay: Turkish ğ, ş, ı and
 İ are in it.
+
+## Round 3 (site at commit 9346320)
+
+The legal pages now carry real text and are indexable again: `/kosullar` (480 words), `/gizlilik`
+(474) and `/destek` (243) are in the sitemap. `/kvkk` shows the same text as `/gizlilik`, has
+`/gizlilik` as its canonical, and is left out of the sitemap. Validator: `88 passed · 0 failed · 3
+warnings`. Two warnings are the deliberate ones; the third is `/kvkk`'s `og:url`, which still points
+at `/kvkk` instead of the canonical.
+
+| # | Problem | How found | Fix |
+|---|---|---|---|
+| 10 | **Misleading og:url advice on a deliberate cross-canonical.** `/kvkk` keeps its own og:url and canonicalizes to `/gizlilik`. The warning was right, but it blamed layout inheritance, which sends the developer looking for a bug that isn't there. | Round 3 output for `/kvkk`. | When og:url is the page's own URL and the canonical points elsewhere, the message now says to point og:url at the canonical. |

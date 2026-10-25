@@ -907,6 +907,10 @@ function checkPage (add, page, res, origin = null, sitemapUrls = null) {
   if (ogUrl && canonicals.length === 1 && /^https?:\/\//i.test(canonicals[0])) {
     if (sameUrl(ogUrl, canonicals[0])) {
       add(`page[${page}].og-url`, 'open_graph', 7, 'pass', 'og:url matches the canonical.')
+    } else if (res.url && sameUrl(ogUrl, res.url)) {
+      add(`page[${page}].og-url`, 'open_graph', 7, 'warn',
+        `og:url is this page's own URL (${ogUrl}), but the page canonicalizes to ${canonicals[0]}. Point ` +
+        'og:url at the canonical too, so shares consolidate on the same URL search engines index.')
     } else {
       add(`page[${page}].og-url`, 'open_graph', 7, 'warn',
         `og:url is ${ogUrl} but the canonical is ${canonicals[0]}. Shares of this page are attributed to ` +

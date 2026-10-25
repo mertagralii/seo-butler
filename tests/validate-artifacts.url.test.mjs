@@ -378,6 +378,25 @@ describe('validate-artifacts.mjs --url', () => {
       assert.match(ogUrl.detail, /merges shallowly/)
     })
 
+    test('a page that canonicalizes elsewhere but keeps its own og:url is told to follow the canonical', async () => {
+      const routes = {
+        '/robots.txt': { type: 'text/plain', body: robotsTxt() },
+        '/sitemap.xml': { body: sitemap(['/']) }
+      }
+      const server = await startServer(routes)
+      routes['/kvkk'] = { body: goodPage({ canonical: 'https://example.com/gizlilik', ogUrl: `${server.origin}/kvkk` }) }
+      try {
+        const r = await runJsonAsync('validate-artifacts.mjs', ['--url', server.origin, '--pages', '/kvkk', '--no-links'])
+        const ogUrl = check(r.json, 'page[/kvkk].og-url')
+        assert.equal(ogUrl.status, 'warn')
+        assert.match(ogUrl.detail, /this page's own URL/)
+        assert.match(ogUrl.detail, /canonicalizes to https:\/\/example\.com\/gizlilik/)
+        assert.doesNotMatch(ogUrl.detail, /shared layout/)
+      } finally {
+        await server.close()
+      }
+    })
+
     test('a canonical, sitemap and Sitemap line on another localhost port warn as a site-URL fallback', async () => {
       const { result } = await auditSite({
         '/robots.txt': { type: 'text/plain', body: robotsTxt({ sitemapUrl: 'http://localhost:3100/sitemap.xml' }) },

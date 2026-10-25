@@ -1,7 +1,7 @@
 # Durum
 
 ## Şu an
-Idle. The Capsle.Web dogfood is through round 2; Capsle.Web passes the audit.
+Waiting on Mert. PR #1 (v2.5.0) is ready; CLAUDE.md, the squash-merge, the tag and the release need his approval typed in this session. Capsle.Web passes round 3.
 
 ## Son biten
 - 2026-10-26 — Round 2 logged in `docs/dogfood-capsle.md` (`8330f39`)
