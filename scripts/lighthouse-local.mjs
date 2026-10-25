@@ -10,7 +10,7 @@
  *
  * It does not require Chrome specifically, and it installs nothing. It looks for a Chromium that is
  * already there - Chrome, Edge, Brave, plain Chromium, or the one Playwright downloaded - starts it
- * headless on a throwaway profile, and points `npx -y lighthouse@12` at its DevTools port.
+ * headless on a throwaway profile, and points `npx -y lighthouse@13` at its DevTools port.
  *
  * Three design choices are load-bearing, each because the obvious alternative breaks:
  *
@@ -64,7 +64,7 @@ Exit 0 measured - Exit 1 could not measure, stdout carries {"ok":false,"reason":
 `.trim()
 
 /** The pinned major. The LHR shape is a contract triage-external.mjs parses; @latest could break it silently. */
-const LIGHTHOUSE_SPEC = 'lighthouse@12'
+const LIGHTHOUSE_SPEC = 'lighthouse@13'
 
 const DEFAULT_CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo']
 
@@ -354,8 +354,16 @@ function summarize (doc, wanted = DEFAULT_CATEGORIES, extra = {}) {
 
   const metrics = {}
   for (const [key, auditId] of Object.entries(METRIC_AUDIT)) {
-    const v = lhr.audits?.[auditId]?.numericValue
+    const audit = lhr.audits?.[auditId]
+    const v = audit?.numericValue
     if (typeof v === 'number') metrics[key] = key === 'cls' ? Number(v.toFixed(3)) : Math.round(v)
+    else if (audit?.scoreDisplayMode === 'error') {
+      unavailable.push({
+        what: key,
+        reason: `Lighthouse could not compute ${auditId}: ${audit.errorMessage || 'error'}. A metric error ` +
+          'also leaves the performance score empty; re-run with a newer Lighthouse before reading it as a page defect'
+      })
+    }
   }
 
   return {
