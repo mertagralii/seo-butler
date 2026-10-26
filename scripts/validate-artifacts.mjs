@@ -54,6 +54,8 @@ const TITLE_MIN = 15
 const DESC_MAX = 160
 const DESC_MIN = 50
 
+const THIN_WORDS = 50
+
 const USAGE = `
 validate-artifacts.mjs - deterministic SEO artifact checks
 
@@ -318,6 +320,66 @@ function metaByProperty (html, prop) {
   return metaContent(html, tag => (attr(tag, 'property') ?? '').toLowerCase() === prop.toLowerCase())
 }
 
+function isLoopback (url) {
+  try {
+    const host = new URL(url).hostname.toLowerCase()
+    return host === 'localhost' || host.endsWith('.localhost') || host === '[::1]' ||
+      host === '0.0.0.0' || /^127(\.\d{1,3}){3}$/.test(host)
+  } catch {
+    return false
+  }
+}
+
+function hostVerdict (target, origin) {
+  let targetOrigin
+  try {
+    targetOrigin = new URL(target).origin
+    origin = new URL(origin).origin
+  } catch {
+    return null
+  }
+  if (targetOrigin === origin) return null
+  if (isLoopback(target) && !isLoopback(origin)) {
+    return {
+      status: 'fail',
+      note: `points at ${targetOrigin}, a local address, on a site served from ${origin}. The site URL fell ` +
+        'back to its development default in this build, so search engines are sent to localhost.'
+    }
+  }
+  if (isLoopback(target)) {
+    return {
+      status: 'warn',
+      note: `points at ${targetOrigin}, but this build is served from ${origin}. The site URL is not coming ` +
+        'from this run\'s configuration - usually an env var with a hard-coded localhost fallback. A ' +
+        'production build made the same way would point every page at localhost.'
+    }
+  }
+  if (isLoopback(origin)) return null
+  return {
+    status: 'warn',
+    note: `points at ${targetOrigin}, not at the origin being audited (${origin}). Pick one host (www or ` +
+      'apex, http or https) and use it everywhere.'
+  }
+}
+
+function sameUrl (a, b) {
+  try {
+    return new URL(a).href === new URL(b).href
+  } catch {
+    return a === b
+  }
+}
+
+function visibleWords (html) {
+  const scope = html.match(/<main\b[^>]*>([\s\S]*?)<\/main\s*>/i)?.[1] ??
+    html.match(/<body\b[^>]*>([\s\S]*?)<\/body\s*>/i)?.[1] ?? html
+  const text = scope
+    .replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1\s*>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[#\w]+;/g, ' ')
+  return text.split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).length
+}
+
 // ---------------------------------------------------------------- check plumbing
 
 function makeReporter () {
@@ -351,7 +413,7 @@ function missingInRepo (add, id, item, checklist, name, live) {
   }
 }
 
-function checkRobots (add, source, robots, live) {
+function checkRobots (add, source, robots, live, origin = null) {
   const label = source === 'live' ? 'live' : 'repo'
 
   if (!robots.ok) {
@@ -388,6 +450,13 @@ function checkRobots (add, source, robots, live) {
     } else {
       add(`robots.${source}.sitemap-directive`, 'robots_txt', 1, 'pass',
         `Sitemap declared: ${parsed.sitemaps.slice().sort().join(', ')}`)
+      const off = parsed.sitemaps.slice().sort()
+        .map(s => ({ s, v: hostVerdict(s, origin) }))
+        .filter(x => x.v)
+      if (off.length) {
+        add(`robots.${source}.sitemap-host`, 'robots_txt', 1, off.some(x => x.v.status === 'fail') ? 'fail' : 'warn',
+          `The Sitemap line ${off[0].v.note} (${off.map(x => x.s).join(', ')})`)
+      }
     }
   }
 
@@ -405,7 +474,7 @@ function checkRobots (add, source, robots, live) {
   return parsed
 }
 
-function checkSitemap (add, source, sitemap, live) {
+function checkSitemap (add, source, sitemap, live, origin = null) {
   const label = source === 'live' ? 'live' : 'repo'
 
   if (!sitemap.ok) {
@@ -447,6 +516,13 @@ function checkSitemap (add, source, sitemap, live) {
   } else {
     add(`sitemap.${source}.urls`, 'sitemap_xml', 2, 'pass',
       `${locCount} <loc> ${isIndex ? 'sitemap references' : 'URLs'} (${label}).`)
+    const off = [...body.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)]
+      .map(m => ({ loc: m[1], v: hostVerdict(m[1], origin) }))
+      .filter(x => x.v)
+    if (off.length) {
+      add(`sitemap.${source}.host`, 'sitemap_xml', 2, off.some(x => x.v.status === 'fail') ? 'fail' : 'warn',
+        `${off.length} of ${locCount} <loc> URL(s): the first ${off[0].v.note} (e.g. ${off[0].loc})`)
+    }
   }
 
   if (!isIndex && locCount > 0 && lastmodCount === 0) {
@@ -477,9 +553,17 @@ function checkJsonLd (add, page, html) {
     /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script\s*>/gi
   )]
 
+  const isHome = page === '/'
+
   if (blocks.length === 0) {
-    add(`page[${page}].jsonld.present`, 'structured_data', 9, 'fail',
-      'No `application/ld+json` block. Organization + WebSite are the documented minimum.')
+    if (isHome) {
+      add(`page[${page}].jsonld.present`, 'structured_data', 9, 'fail',
+        'No `application/ld+json` block. Organization + WebSite are the documented minimum, on the home page.')
+    } else {
+      add(`page[${page}].jsonld.present`, 'structured_data', 9, 'info',
+        'No `application/ld+json` block. Not a defect on its own: Organization + WebSite belong on the home ' +
+        'page, and an inner page needs a type only when its content earns one (FAQPage, Article, ...).')
+    }
     return
   }
 
@@ -508,7 +592,7 @@ function checkJsonLd (add, page, html) {
     add(`page[${page}].jsonld.parse`, 'structured_data', 9, 'pass',
       `${blocks.length} JSON-LD block(s), all valid JSON. @type: ${unique.length ? unique.join(', ') : '(none declared)'}`)
 
-    for (const required of ['Organization', 'WebSite']) {
+    for (const required of isHome ? ['Organization', 'WebSite'] : []) {
       const has = unique.some(t => t === required || (required === 'Organization' && t === 'LocalBusiness'))
       add(`page[${page}].jsonld.${required.toLowerCase()}`, 'structured_data', 9, has ? 'pass' : 'warn',
         has ? `${required} present.` : `${required} missing (standards.md lists it as always-on).`)
@@ -543,6 +627,33 @@ function absolutize (href, base) {
   }
 }
 
+function fragmentTarget (href, base) {
+  if (/^(mailto:|tel:|sms:|javascript:|data:|blob:|ftp:)/i.test(href)) return null
+  try {
+    const u = new URL(href, base)
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null
+    let id = u.hash.slice(1)
+    try {
+      id = decodeURIComponent(id)
+    } catch {}
+    if (!id || id.toLowerCase() === 'top') return null
+    u.hash = ''
+    return { url: u.toString(), id }
+  } catch {
+    return null
+  }
+}
+
+function pageIds (html) {
+  const ids = new Set()
+  for (const m of html.matchAll(/<[a-zA-Z][^>]*?\sid\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) ids.add(m[1] ?? m[2])
+  for (const tag of html.match(/<a\b[^>]*>/gi) ?? []) {
+    const name = attr(tag, 'name')
+    if (name) ids.add(name)
+  }
+  return ids
+}
+
 function shortenUrl (url, origin) {
   return url.startsWith(origin) ? (url.slice(origin.length) || '/') : url
 }
@@ -568,6 +679,8 @@ async function checkLinks (add, origin, seeds, { maxLinks, linkDepth }) {
   let frontier = [...new Set(seeds.map(s => absolutize(s, origin)).filter(Boolean))]
   const enqueued = new Set(frontier)
   let dropped = 0
+  const anchors = new Map()
+  const idsByUrl = new Map()
 
   for (let depth = 0; depth <= linkDepth && frontier.length; depth++) {
     const room = maxLinks - visited.size
@@ -591,7 +704,17 @@ async function checkLinks (add, origin, seeds, { maxLinks, linkDepth }) {
       if (isLeaf || !res.ok || !res.text) continue
       if (!/^\s*<(!doctype|html)/i.test(res.text.slice(0, 200).trim())) continue
 
+      const ids = pageIds(res.text)
+      idsByUrl.set(url, ids)
+      if (res.url) idsByUrl.set(res.url, ids)
+
       for (const href of extractHrefs(res.text)) {
+        const frag = fragmentTarget(href, res.url || url)
+        if (frag && new URL(frag.url).origin === baseOrigin) {
+          const key = `${frag.url}#${frag.id}`
+          if (!anchors.has(key)) anchors.set(key, { ...frag, from: new Set() })
+          anchors.get(key).from.add(shortenUrl(url, baseOrigin))
+        }
         const abs = absolutize(href, res.url || url)
         if (!abs || new URL(abs).origin !== baseOrigin) continue
         if (!referrers.has(abs)) referrers.set(abs, new Set())
@@ -652,18 +775,37 @@ async function checkLinks (add, origin, seeds, { maxLinks, linkDepth }) {
       `${visited.size} internal URL(s) checked, none broken.`)
   }
 
+  let anchorsUnchecked = 0
+  const sortedAnchors = [...anchors.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+  for (const [, a] of sortedAnchors) {
+    const ids = idsByUrl.get(a.url)
+    if (!ids) {
+      anchorsUnchecked++
+      continue
+    }
+    if (ids.has(a.id)) continue
+    const path = shortenUrl(a.url, baseOrigin)
+    const from = [...a.from].sort()
+    add(`links.anchor[${path}#${a.id}]`, 'broken_links', 13, 'warn',
+      `No element with id="${a.id}" in the served HTML of ${path}. The link lands at the top of the page ` +
+      'instead of the section; if the id is added by client-side script, crawlers never see it either. ' +
+      `Linked from ${from.length} page(s): ${from.slice(0, 5).join(', ')}${from.length > 5 ? ` (+${from.length - 5} more)` : ''}.`)
+  }
+
   // No silent caps: if the crawl stopped short, the report says so rather than implying full coverage.
   add('links.coverage', null, null, 'info',
     `Link crawl: ${visited.size} internal URL(s) visited, depth ${linkDepth}, cap ${maxLinks}.` +
     (dropped > 0
       ? ` ${dropped} queued URL(s) NOT checked - the cap was hit. Raise --max-links for full coverage.`
       : ' Cap not reached.') +
+    ` ${anchors.size - anchorsUnchecked} in-page anchor target(s) checked against the served HTML` +
+    (anchorsUnchecked ? `, ${anchorsUnchecked} not (their page was only probed, not read).` : '.') +
     ' External links are not checked here (report-only per checklist item 13). Redirect chains are ' +
     'counted only at the outermost depth, where links are probed rather than followed - a chain on a ' +
     'page the crawl descended through will not be reported.')
 }
 
-function checkPage (add, page, res) {
+function checkPage (add, page, res, origin = null, sitemapUrls = null) {
   if (!res.ok) {
     add(`page[${page}].reachable`, 'broken_links', 13, 'fail',
       `HTTP ${res.status}${res.error ? ` - ${res.error}` : ''}`)
@@ -685,9 +827,15 @@ function checkPage (add, page, res) {
     add(`page[${page}].title`, 'titles', 3, 'pass', `<title> ${title.length} chars.`)
   }
 
+  const robotsMeta = metaByName(html, 'robots')
+  const noindex = !!robotsMeta && /noindex/i.test(robotsMeta)
+
   // meta description
   const desc = metaByName(html, 'description')
-  if (!desc) {
+  if (noindex && desc) {
+    add(`page[${page}].description`, 'meta_description', 4, 'info',
+      `Meta description ${desc.length} chars. Not judged: the page is noindex, so search never shows it.`)
+  } else if (!desc) {
     add(`page[${page}].description`, 'meta_description', 4, 'fail', 'No meta description.')
   } else if (desc.length > DESC_MAX) {
     add(`page[${page}].description`, 'meta_description', 4, 'warn',
@@ -714,18 +862,35 @@ function checkPage (add, page, res) {
     add(`page[${page}].canonical`, 'canonical', 5, 'warn',
       `Canonical is relative ("${canonicals[0]}"); standards.md requires an absolute URL.`)
   } else {
-    add(`page[${page}].canonical`, 'canonical', 5, 'pass', `Canonical: ${canonicals[0]}`)
+    const off = hostVerdict(canonicals[0], origin)
+    add(`page[${page}].canonical`, 'canonical', 5, off ? off.status : 'pass',
+      off ? `Canonical ${canonicals[0]} ${off.note}` : `Canonical: ${canonicals[0]}`)
   }
 
   // meta robots / noindex hygiene
-  const robotsMeta = metaByName(html, 'robots')
-  if (robotsMeta && /noindex/i.test(robotsMeta)) {
+  const listed = sitemapUrls && res.url ? [...sitemapUrls].some(u => sameUrl(u, res.url)) : null
+  if (noindex && page !== '/' && listed === false) {
+    add(`page[${page}].noindex`, 'robots_hygiene', 11, 'info',
+      `Page declares <meta name="robots" content="${robotsMeta}"> and is left out of sitemap.xml - the two ` +
+      'agree, so the exclusion looks deliberate. Only a defect if this page is meant to rank.')
+  } else if (noindex) {
     add(`page[${page}].noindex`, 'robots_hygiene', 11, 'fail',
       `Page declares <meta name="robots" content="${robotsMeta}">. If this page is meant to rank, ` +
-      'that single tag removes it from search.')
+      'that single tag removes it from search.' +
+      (listed ? ' It is also listed in sitemap.xml, which asks search engines to index it: one of the two is wrong.' : ''))
   } else {
     add(`page[${page}].noindex`, 'robots_hygiene', 11, 'pass',
       robotsMeta ? `meta robots: ${robotsMeta}` : 'No meta robots restriction.')
+
+    const words = visibleWords(html)
+    if (words < THIN_WORDS) {
+      add(`page[${page}].thin`, 'robots_hygiene', 11, 'warn',
+        `Indexable, with only ${words} words of text in the served HTML. Fine for a page that is complete ` +
+        'as it is; if it is a placeholder or a draft, keep it out of the index until the real content ' +
+        'ships (noindex, and drop it from sitemap.xml).')
+    } else {
+      add(`page[${page}].thin`, 'robots_hygiene', 11, 'pass', `${words} words of text in the served HTML.`)
+    }
   }
 
   // Open Graph
@@ -736,6 +901,22 @@ function checkPage (add, page, res) {
       `Missing Open Graph tags: ${ogMissing.join(', ')}`)
   } else {
     add(`page[${page}].opengraph`, 'open_graph', 7, 'pass', 'All five core Open Graph tags present.')
+  }
+
+  const ogUrl = metaByProperty(html, 'og:url')
+  if (ogUrl && canonicals.length === 1 && /^https?:\/\//i.test(canonicals[0])) {
+    if (sameUrl(ogUrl, canonicals[0])) {
+      add(`page[${page}].og-url`, 'open_graph', 7, 'pass', 'og:url matches the canonical.')
+    } else if (res.url && sameUrl(ogUrl, res.url)) {
+      add(`page[${page}].og-url`, 'open_graph', 7, 'warn',
+        `og:url is this page's own URL (${ogUrl}), but the page canonicalizes to ${canonicals[0]}. Point ` +
+        'og:url at the canonical too, so shares consolidate on the same URL search engines index.')
+    } else {
+      add(`page[${page}].og-url`, 'open_graph', 7, 'warn',
+        `og:url is ${ogUrl} but the canonical is ${canonicals[0]}. Shares of this page are attributed to ` +
+        'the og:url. Usual cause: Open Graph set once in a shared layout and inherited by pages that do ' +
+        'not set their own (Next.js metadata, for one, merges shallowly).')
+    }
   }
 
   // Twitter card
@@ -878,24 +1059,28 @@ async function run (args) {
   }
 
   if (args.url) {
-    checkRobots(add, 'live', live.robots, null)
-    checkSitemap(add, 'live', live.sitemap, null)
+    checkRobots(add, 'live', live.robots, null, origin)
+    checkSitemap(add, 'live', live.sitemap, null, origin)
 
     add('llms.live', 'llms_txt', 22, live.llms.ok ? 'pass' : 'warn',
       live.llms.ok ? 'llms.txt served.' : `No llms.txt (HTTP ${live.llms.status}).`)
 
+    const sitemapLocs = live.sitemap?.ok
+      ? [...stripBom(live.sitemap.text).matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map(m => m[1])
+      : []
+    const sitemapUrls = live.sitemap?.ok
+      ? new Set(sitemapLocs.map(l => absolutize(l, origin)).filter(Boolean))
+      : null
+
     for (const page of args.pages) {
       const path = page.startsWith('/') ? page : `/${page}`
-      checkPage(add, path, await fetchRaw(`${origin}${path}`))
+      checkPage(add, path, await fetchRaw(`${origin}${path}`), origin, sitemapUrls)
     }
 
     if (args.links) {
       // Seed from the requested pages AND the sitemap. The sitemap alone is not enough (noindex pages
       // are deliberately absent from it), and the requested pages alone are not enough (they are
       // usually just "/"), so the union is what gives the crawl somewhere real to start.
-      const sitemapLocs = live.sitemap?.ok
-        ? [...stripBom(live.sitemap.text).matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map(m => m[1])
-        : []
       const seeds = [
         ...args.pages.map(p => `${origin}${p.startsWith('/') ? p : `/${p}`}`),
         ...sitemapLocs

@@ -100,7 +100,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/lighthouse-local.mjs --url https://<site>/<pa
   --strategy mobile --out .seo-butler/lhr-home.json
 ```
 
-It finds a browser, starts it headless on a throwaway profile, runs `npx -y lighthouse@12` against
+It finds a browser, starts it headless on a throwaway profile, runs `npx -y lighthouse@13` against
 it, and prints a **compact score summary** to stdout. The full LHR goes to `--out`, not into the
 conversation — it is megabytes, and that file is exactly what `/seo-verify` feeds to
 `triage-external.mjs --lighthouse` (`ground-truth.md`).

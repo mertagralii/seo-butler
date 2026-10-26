@@ -24,6 +24,7 @@ const SCRIPT = 'lighthouse-local.mjs'
 
 const LHR_SCORED = fixture('external', 'lighthouse-lhr-scored.json')
 const LHR_NULL_CATEGORY = fixture('external', 'lighthouse-lhr-null-category.json')
+const LHR_METRIC_ERROR = fixture('external', 'lighthouse-lhr-metric-error.json')
 const LHR_RUNTIME_ERROR = fixture('external', 'lighthouse-lhr-runtime-error.json')
 
 const json = r => {
@@ -146,6 +147,16 @@ describe('lighthouse-local: --summarize never invents a number', () => {
     const out = json(run(SCRIPT, ['--summarize', LHR_SCORED]))
     assert.equal(out.audits, undefined)
     assert.ok(run(SCRIPT, ['--summarize', LHR_SCORED]).stdout.length < 1500)
+  })
+
+  test('a metric Lighthouse could not compute says why, so an empty score is not read as the page', () => {
+    const out = json(run(SCRIPT, ['--summarize', LHR_METRIC_ERROR]))
+    assert.equal(out.ok, true)
+    assert.equal(out.metrics.lcp, undefined)
+    const lcp = out.unavailable.find(u => u.what === 'lcp')
+    assert.match(lcp.reason, /largest-contentful-paint: NO_LCP/)
+    assert.match(lcp.reason, /newer Lighthouse/)
+    assert.ok(out.unavailable.some(u => u.what === 'performance'))
   })
 
   test('a null category is unavailable, never a zero', () => {

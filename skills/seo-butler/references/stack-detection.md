@@ -54,6 +54,18 @@ top way to break a site. Patterns below are the shape; context7 gives the exact 
 - `app/robots.ts` → returns rules + sitemap URL. `app/sitemap.ts` → returns the URL array.
 - JSON-LD: render `<script type="application/ld+json" dangerouslySetInnerHTML=...>` in a Server Component.
 - Analytics: prefer `@next/third-parties/google` `<GoogleAnalytics gaId=...>`.
+- **Metadata merges shallowly.** A page that sets `openGraph` replaces the layout's whole `openGraph`
+  object: `og:type`, `og:site_name`, `og:locale` and the file-based `opengraph-image` all disappear from
+  that page. A page that sets nothing inherits the layout's `openGraph.url`, so every such page claims
+  to be the home page. Keep one shared Open Graph base, spread it into each page's `openGraph`, and set
+  `url` per page to the same path as `alternates.canonical`.
+- **`metadataBase` and the site URL.** Canonicals, `og:url`, the sitemap and the robots `Sitemap:` line
+  are all built from it. When it reads an env var with a `localhost` fallback, a build without the
+  variable ships every one of them pointing at localhost; fail the production build when it is unset
+  instead of falling back.
+- **Placeholders stay out of the index** until their content exists: `robots: { index: false }` in the
+  page's `metadata`, and leave the route out of `app/sitemap.ts`. Permanent URLs (legal pages an app
+  store links to) keep their route; only the indexing waits.
 
 **Next.js (Pages Router)** — `next/head` `<Head>` per page; `public/robots.txt`; sitemap via
 `next-sitemap` or an API route; gtag via `next/script` with `strategy="afterInteractive"`.

@@ -143,6 +143,18 @@ describe('triage-external.mjs', () => {
       assert.ok(codes.includes('image-alt'), 'a genuinely failing audit is kept')
     })
 
+    test('Lighthouse 12 insight audits land on the same job as the classic audit they restate', () => {
+      const result = triage(['--lighthouse', fixture('external', 'lighthouse-lhr-v12-insights.json')])
+
+      const blocking = byItem(result, 28, 'act')
+      assert.deepEqual(blocking.codes, ['render-blocking-insight', 'render-blocking-resources'])
+      assert.deepEqual(byItem(result, 26, 'act').codes, ['largest-contentful-paint', 'largest-contentful-paint-element'])
+
+      const unmapped = result.groups.filter(g => g.item === null).flatMap(g => g.codes)
+      assert.deepEqual(unmapped, ['target-size'], 'only the audit with no checklist item stays unmapped')
+      assert.ok(result.groups.length < result.rawFindings, 'twelve raw findings must not read as twelve jobs')
+    })
+
     test('a partial score is a warning, a zero is critical', () => {
       const result = triage(['--lighthouse', LIGHTHOUSE])
       assert.equal(result.groups.find(g => g.codes.includes('image-alt')).severity, 'critical')

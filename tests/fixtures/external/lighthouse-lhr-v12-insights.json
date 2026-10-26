@@ -1,0 +1,115 @@
+{
+  "$fixture": "Trimmed LHR from a real lighthouse-local.mjs run against a Next.js 16 landing page served by next start on localhost (mobile). Only the failing scored audits are kept. Lighthouse 12 reports most performance problems twice, once as a classic audit and once as an *-insight audit.",
+  "lighthouseVersion": "12.8.2",
+  "fetchTime": "2026-10-25T21:50:36.262Z",
+  "requestedUrl": "http://localhost:4517/",
+  "finalDisplayedUrl": "http://localhost:4517/",
+  "configSettings": {
+    "formFactor": "mobile"
+  },
+  "categories": {
+    "performance": {
+      "id": "performance",
+      "title": "Performance",
+      "score": 0.91
+    },
+    "accessibility": {
+      "id": "accessibility",
+      "title": "Accessibility",
+      "score": 0.96
+    },
+    "best-practices": {
+      "id": "best-practices",
+      "title": "Best Practices",
+      "score": 1
+    },
+    "seo": {
+      "id": "seo",
+      "title": "SEO",
+      "score": 1
+    }
+  },
+  "audits": {
+    "largest-contentful-paint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint",
+      "score": 0.65,
+      "scoreDisplayMode": "numeric",
+      "displayValue": "3.5 s"
+    },
+    "max-potential-fid": {
+      "id": "max-potential-fid",
+      "title": "Max Potential First Input Delay",
+      "score": 0.99,
+      "scoreDisplayMode": "numeric",
+      "displayValue": "70 ms"
+    },
+    "interactive": {
+      "id": "interactive",
+      "title": "Time to Interactive",
+      "score": 0.92,
+      "scoreDisplayMode": "numeric",
+      "displayValue": "3.5 s"
+    },
+    "largest-contentful-paint-element": {
+      "id": "largest-contentful-paint-element",
+      "title": "Largest Contentful Paint element",
+      "score": 0,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "3,460 ms"
+    },
+    "target-size": {
+      "id": "target-size",
+      "title": "Touch targets do not have sufficient size or spacing.",
+      "score": 0,
+      "scoreDisplayMode": "binary"
+    },
+    "render-blocking-resources": {
+      "id": "render-blocking-resources",
+      "title": "Eliminate render-blocking resources",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings"
+    },
+    "unused-javascript": {
+      "id": "unused-javascript",
+      "title": "Reduce unused JavaScript",
+      "score": 0,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 29 KiB"
+    },
+    "legacy-javascript": {
+      "id": "legacy-javascript",
+      "title": "Avoid serving legacy JavaScript to modern browsers",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 13 KiB"
+    },
+    "dom-size": {
+      "id": "dom-size",
+      "title": "Avoid an excessive DOM size",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "1,069 elements"
+    },
+    "legacy-javascript-insight": {
+      "id": "legacy-javascript-insight",
+      "title": "Legacy JavaScript",
+      "score": 0.5,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 14 KiB"
+    },
+    "network-dependency-tree-insight": {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "scoreDisplayMode": "numeric"
+    },
+    "render-blocking-insight": {
+      "id": "render-blocking-insight",
+      "title": "Render blocking requests",
+      "score": 0,
+      "scoreDisplayMode": "metricSavings",
+      "displayValue": "Est savings of 140 ms"
+    }
+  }
+}

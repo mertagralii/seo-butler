@@ -274,6 +274,29 @@ describe('validate-artifacts.mjs --url', () => {
       assert.match(noindex.detail, /If this page is meant to rank/)
     })
 
+    test('an inner noindex page that the sitemap also leaves out reads as deliberate, not as a failure', async () => {
+      const { result } = await auditSite({
+        '/sitemap.xml': { body: sitemap(['/'], { base: '' }) },
+        '/kvkk': { body: goodPage({ robotsMeta: 'noindex, follow', description: 'Taslak metin.' }) }
+      }, { args: ['--no-links'], pages: '/,/kvkk' })
+
+      const noindex = check(result, 'page[/kvkk].noindex')
+      assert.equal(noindex.status, 'info')
+      assert.match(noindex.detail, /the two agree/)
+      assert.equal(check(result, 'page[/kvkk].description').status, 'info')
+    })
+
+    test('a noindex page that the sitemap lists fails as a contradiction', async () => {
+      const { result } = await auditSite({
+        '/sitemap.xml': { body: sitemap(['/', '/kvkk'], { base: '' }) },
+        '/kvkk': { body: goodPage({ robotsMeta: 'noindex' }) }
+      }, { args: ['--no-links'], pages: '/,/kvkk' })
+
+      const noindex = check(result, 'page[/kvkk].noindex')
+      assert.equal(noindex.status, 'fail')
+      assert.match(noindex.detail, /also listed in sitemap\.xml/)
+    })
+
     test('a page that does not respond is reported as unreachable, not as clean', async () => {
       const { result } = await auditSite(
         { '/sitemap.xml': { body: sitemap(['/']) } },
@@ -338,6 +361,145 @@ describe('validate-artifacts.mjs --url', () => {
       } finally {
         await server.close()
       }
+    })
+  })
+
+  describe('what the site says about its own address', () => {
+    test('an og:url inherited from the layout warns, naming both URLs', async () => {
+      const { result } = await auditSite({
+        '/legal': { body: goodPage({ canonical: 'https://example.com/legal', ogUrl: 'https://example.com' }) }
+      }, { args: ['--no-links'], pages: '/,/legal' })
+
+      assert.equal(check(result, 'page[/].og-url').status, 'pass')
+      const ogUrl = check(result, 'page[/legal].og-url')
+      assert.equal(ogUrl.status, 'warn')
+      assert.equal(ogUrl.checklist, 7)
+      assert.match(ogUrl.detail, /og:url is https:\/\/example\.com but the canonical is https:\/\/example\.com\/legal/)
+      assert.match(ogUrl.detail, /merges shallowly/)
+    })
+
+    test('a page that canonicalizes elsewhere but keeps its own og:url is told to follow the canonical', async () => {
+      const routes = {
+        '/robots.txt': { type: 'text/plain', body: robotsTxt() },
+        '/sitemap.xml': { body: sitemap(['/']) }
+      }
+      const server = await startServer(routes)
+      routes['/kvkk'] = { body: goodPage({ canonical: 'https://example.com/gizlilik', ogUrl: `${server.origin}/kvkk` }) }
+      try {
+        const r = await runJsonAsync('validate-artifacts.mjs', ['--url', server.origin, '--pages', '/kvkk', '--no-links'])
+        const ogUrl = check(r.json, 'page[/kvkk].og-url')
+        assert.equal(ogUrl.status, 'warn')
+        assert.match(ogUrl.detail, /this page's own URL/)
+        assert.match(ogUrl.detail, /canonicalizes to https:\/\/example\.com\/gizlilik/)
+        assert.doesNotMatch(ogUrl.detail, /shared layout/)
+      } finally {
+        await server.close()
+      }
+    })
+
+    test('a canonical, sitemap and Sitemap line on another localhost port warn as a site-URL fallback', async () => {
+      const { result } = await auditSite({
+        '/robots.txt': { type: 'text/plain', body: robotsTxt({ sitemapUrl: 'http://localhost:3100/sitemap.xml' }) },
+        '/sitemap.xml': { body: sitemap(['/'], { base: 'http://localhost:3100' }) },
+        '/': { body: goodPage({ canonical: 'http://localhost:3100/' }) }
+      }, { args: ['--no-links'] })
+
+      for (const id of ['page[/].canonical', 'sitemap.live.host', 'robots.live.sitemap-host']) {
+        const c = check(result, id)
+        assert.equal(c?.status, 'warn', id)
+        assert.match(c.detail, /localhost:3100/)
+        assert.match(c.detail, /hard-coded localhost fallback/)
+      }
+    })
+
+    test('a production canonical on a build served locally is what a pre-deploy run should see', async () => {
+      const { result } = await auditSite({
+        '/sitemap.xml': { body: sitemap(['/']) }
+      }, { args: ['--no-links'] })
+
+      assert.equal(check(result, 'page[/].canonical').status, 'pass')
+      assert.equal(check(result, 'sitemap.live.host'), null)
+      assert.equal(check(result, 'robots.live.sitemap-host'), null)
+    })
+  })
+
+  describe('JSON-LD scope', () => {
+    test('no JSON-LD fails on the home page and is only a note on an inner page', async () => {
+      const bare = goodPage().replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '')
+      const { result } = await auditSite({
+        '/': { body: bare },
+        '/kvkk': { body: bare }
+      }, { args: ['--no-links'], pages: '/,/kvkk' })
+
+      assert.equal(check(result, 'page[/].jsonld.present').status, 'fail')
+      const inner = check(result, 'page[/kvkk].jsonld.present')
+      assert.equal(inner.status, 'info')
+      assert.match(inner.detail, /Not a defect on its own/)
+    })
+
+    test('Organization and WebSite are only expected on the home page', async () => {
+      const faqOnly = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [] })
+      const { result } = await auditSite({
+        '/sss': { body: goodPage({ jsonLd: faqOnly }) }
+      }, { args: ['--no-links'], pages: '/,/sss' })
+
+      assert.equal(check(result, 'page[/].jsonld.organization').status, 'pass')
+      assert.equal(check(result, 'page[/sss].jsonld.parse').status, 'pass')
+      assert.equal(check(result, 'page[/sss].jsonld.organization'), null)
+      assert.equal(check(result, 'page[/sss].jsonld.website'), null)
+    })
+  })
+
+  describe('in-page anchors', () => {
+    test('a link to a section id that is not in the served HTML warns, naming who links to it', async () => {
+      const home = goodPage({ links: ['#icerik', '/#nasil', '/#sss', '/about'] })
+        .replace('<h1>', '<h1 id="nasil">')
+        .replace('<body>', '<body><main id="icerik">')
+      const { result } = await auditSite({
+        '/': { body: home },
+        '/about': { body: goodPage({ links: ['/#sss', '/#nasil', '/#top'] }) }
+      })
+
+      assert.equal(check(result, 'links.anchor[/#nasil]'), null)
+      assert.equal(check(result, 'links.anchor[/#icerik]'), null)
+      assert.equal(check(result, 'links.anchor[/#top]'), null)
+      const sss = check(result, 'links.anchor[/#sss]')
+      assert.equal(sss.status, 'warn')
+      assert.equal(sss.checklist, 13)
+      assert.match(sss.detail, /No element with id="sss"/)
+      assert.match(sss.detail, /Linked from 2 page\(s\): \/, \/about/)
+      assert.match(check(result, 'links.coverage').detail, /3 in-page anchor target\(s\) checked/)
+    })
+
+    test('an anchor whose page was only probed is counted as unchecked, not as fine', async () => {
+      const { result } = await auditSite({
+        '/': { body: goodPage({ links: ['/deep#x'] }) },
+        '/deep': { body: goodPage() }
+      }, { args: ['--link-depth', '1'] })
+
+      assert.match(check(result, 'links.coverage').detail, /0 in-page anchor target\(s\) checked .*1 not/)
+    })
+  })
+
+  describe('thin pages', () => {
+    test('an indexable page with almost no text warns as a likely placeholder', async () => {
+      const { result } = await auditSite({
+        '/kosullar': { body: goodPage({ body: 'Bu sayfanın metni hazırlanıyor.' }) }
+      }, { args: ['--no-links'], pages: '/,/kosullar' })
+
+      assert.equal(check(result, 'page[/].thin').status, 'pass')
+      const thin = check(result, 'page[/kosullar].thin')
+      assert.equal(thin.status, 'warn')
+      assert.equal(thin.checklist, 11)
+      assert.match(thin.detail, /noindex, and drop it from sitemap\.xml/)
+    })
+
+    test('a thin page that is already noindex is left alone', async () => {
+      const { result } = await auditSite({
+        '/taslak': { body: goodPage({ body: 'Taslak.', robotsMeta: 'noindex' }) }
+      }, { args: ['--no-links'], pages: '/taslak' })
+
+      assert.equal(check(result, 'page[/taslak].thin'), null)
     })
   })
 

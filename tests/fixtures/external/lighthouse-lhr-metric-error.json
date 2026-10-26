@@ -1,0 +1,20 @@
+{
+  "$fixture": "Trimmed LHR from a real Lighthouse 12.8.2 run on Chrome 155 against a Next.js landing page on localhost. Lantern could not compute LCP (NO_LCP), so the performance category came back null. Lighthouse 13 measured the same page at 3.6 s.",
+  "lighthouseVersion": "12.8.2",
+  "fetchTime": "2026-10-25T22:07:53.433Z",
+  "finalDisplayedUrl": "http://localhost:4517/",
+  "configSettings": {
+    "formFactor": "mobile"
+  },
+  "categories": {
+    "performance": { "id": "performance", "title": "Performance", "score": null },
+    "accessibility": { "id": "accessibility", "title": "Accessibility", "score": 1 },
+    "best-practices": { "id": "best-practices", "title": "Best Practices", "score": 1 },
+    "seo": { "id": "seo", "title": "SEO", "score": 1 }
+  },
+  "audits": {
+    "largest-contentful-paint": { "id": "largest-contentful-paint", "score": null, "scoreDisplayMode": "error", "errorMessage": "NO_LCP" },
+    "cumulative-layout-shift": { "id": "cumulative-layout-shift", "score": 1, "numericValue": 0 },
+    "first-contentful-paint": { "id": "first-contentful-paint", "score": 1, "numericValue": 906.2 }
+  }
+}
