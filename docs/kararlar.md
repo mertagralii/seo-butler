@@ -1,5 +1,9 @@
 # Kararlar
 
+### 2026-10-26 — Squash-merge PR #1 and release v2.5.0; add CLAUDE.md with the session protocol
+**Neden:** Mert reviewed the dogfood work and approved it in this session.
+**Etki:** `master` gets the dogfood fixes as one commit, tagged `v2.5.0` with a GitHub release; `CLAUDE.md` holds the session protocol, the read-first table and the report format.
+
 ### 2026-10-26 — Dogfood work stays on `dogfood/capsle`; no merge, tag or release without Mert
 **Neden:** Mert decides what ships in the plugin and when the marketplace moves.
 **Etki:** every dogfood fix is committed to `dogfood/capsle` and pushed; `master`, tags, `package.json` version and `.claude-plugin/` are untouched until Mert says otherwise.

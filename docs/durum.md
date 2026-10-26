@@ -1,7 +1,7 @@
 # Durum
 
 ## Şu an
-Waiting on Mert. PR #1 (v2.5.0) is ready; CLAUDE.md, the squash-merge, the tag and the release need his approval typed in this session. Capsle.Web passes round 3.
+Releasing v2.5.0: Mert approved on 2026-10-26 (in this session) adding CLAUDE.md, squash-merging PR #1, tagging v2.5.0 and publishing the GitHub release. Capsle.Web passes round 3.
 
 ## Son biten
 - 2026-10-26 — Round 2 logged in `docs/dogfood-capsle.md` (`8330f39`)
@@ -11,14 +11,12 @@ Waiting on Mert. PR #1 (v2.5.0) is ready; CLAUDE.md, the squash-merge, the tag a
 - 2026-10-26 — Triage maps Lighthouse 12 insight and lab-only audits (`2cd0e50`); validator catches og:url drift, site-URL fallbacks, dead anchors and thin pages (`9ac6272`)
 
 ## Sıradaki
-- Review and merge `dogfood/capsle` into `master`. Waits on: Mert.
-- Version bump, tag, marketplace release, and the README "Known limitations" update (Lighthouse 13, macOS verified). Waits on: Mert, after the merge.
+- Update the installed marketplace copy (`/plugin marketplace update`). Waits on: Mert.
 - Round 3 re-audit when Capsle.Web changes SEO-relevant code (metadata, routes, legal text) or gets a domain. Waits on: Capsle.Web / Mert.
 - First live run (`/seo-live`, `/seo-verify`, Search Console) once Capsle has a domain. Waits on: Mert buying the domain.
 
 ## Açık sorular
-- Merge `dogfood/capsle` as is, or squash? Release as v2.5.0?
-- Should this repo get a CLAUDE.md with the session protocol? The coordinator's draft is in the shared session notes; it needs Mert's own OK.
+- None.
 
 ## Bilinen sorunlar
 - `lighthouse-local.mjs` now pins `lighthouse@13`; triage notes still describe insight audits as "Lighthouse 12's insight form". That's accurate (LH12 introduced them), but no LH13-only audit has a fixture yet.
